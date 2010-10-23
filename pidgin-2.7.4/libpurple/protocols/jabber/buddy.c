@@ -38,6 +38,7 @@
 #include "xdata.h"
 #include "pep.h"
 #include "adhoccommands.h"
+#include "jabber_wb.h"
 #include "google/google.h"
 
 typedef struct {
@@ -1740,6 +1741,12 @@ jabber_buddy_cancel_presence_notification(PurpleBlistNode *node,
 static void jabber_wb_blist_node(PurpleBlistNode *node, gpointer data)
 {
 	/* Start the jaber whiteboard with the corresponding user */
+	PurpleBuddy *b = (PurpleBuddy *)node;
+	PurpleAccount *account = purple_buddy_get_account(b);
+	PurpleConnection *gc = purple_account_get_connection(account);
+
+	jabber_wb_initiate(gc, purple_buddy_get_name(b));
+
 }
 
 static void jabber_buddy_rerequest_auth(PurpleBlistNode *node, gpointer data)
@@ -1856,7 +1863,8 @@ static GList *jabber_buddy_menu(PurpleBuddy *buddy)
 	 * supports whiteboard!
 	 */
 	act = purple_menu_action_new(_("Start Whiteboard"),
-								jabber_wb_blist_node, NULL, NULL);
+								PURPLE_CALLBACK(jabber_wb_blist_node),
+								NULL, NULL);
 	m = g_list_append(m, act);
 
 	if(!(jb->subscription & JABBER_SUB_TO)) {

@@ -80,7 +80,7 @@ am__DEPENDENCIES_1 =
 @STATIC_JABBER_FALSE@	$(am__DEPENDENCIES_1)
 am__libjabber_la_SOURCES_DIST = adhoccommands.c adhoccommands.h auth.c \
 	auth.h auth_digest_md5.c auth_plain.c auth_scram.c \
-	auth_scram.h buddy.c buddy.h bosh.c bosh.h caps.c caps.h \
+	auth_scram.h buddy.c buddy.h jabber_wb.c jabber_wb.h bosh.c bosh.h caps.c caps.h \
 	chat.c chat.h data.c data.h disco.c disco.h google/gmail.c \
 	google/gmail.h google/google.c google/google.h \
 	google/google_presence.c google/google_presence.h \
@@ -101,7 +101,7 @@ am__libjabber_la_SOURCES_DIST = adhoccommands.c adhoccommands.h auth.c \
 @USE_CYRUS_SASL_TRUE@am__objects_1 = libjabber_la-auth_cyrus.lo
 am__objects_2 = libjabber_la-adhoccommands.lo libjabber_la-auth.lo \
 	libjabber_la-auth_digest_md5.lo libjabber_la-auth_plain.lo \
-	libjabber_la-auth_scram.lo libjabber_la-buddy.lo \
+	libjabber_la-auth_scram.lo libjabber_la-buddy.lo libjabber_la-jabber_wb.lo \
 	libjabber_la-bosh.lo libjabber_la-caps.lo libjabber_la-chat.lo \
 	libjabber_la-data.lo libjabber_la-disco.lo \
 	libjabber_la-gmail.lo libjabber_la-google.lo \
@@ -423,7 +423,7 @@ EXTRA_DIST = \
 pkgdir = $(libdir)/purple-$(PURPLE_MAJOR_VERSION)
 JABBERSOURCES = adhoccommands.c adhoccommands.h auth.c auth.h \
 	auth_digest_md5.c auth_plain.c auth_scram.c auth_scram.h \
-	buddy.c buddy.h bosh.c bosh.h caps.c caps.h chat.c chat.h \
+	buddy.c buddy.h bosh.c bosh.h caps.c caps.h chat.c chat.h jabber_wb.c jabber_wb.h \
 	data.c data.h disco.c disco.h google/gmail.c google/gmail.h \
 	google/google.c google/google.h google/google_presence.c \
 	google/google_presence.h google/google_roster.c \
@@ -560,6 +560,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libjabber_la-auth_scram.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libjabber_la-bosh.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libjabber_la-buddy.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libjabber_la-jabber_wb.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libjabber_la-caps.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libjabber_la-chat.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libjabber_la-content.Plo@am__quote@
@@ -669,6 +670,15 @@ libjabber_la-buddy.lo: buddy.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='buddy.c' object='libjabber_la-buddy.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libjabber_la_CFLAGS) $(CFLAGS) -c -o libjabber_la-buddy.lo `test -f 'buddy.c' || echo '$(srcdir)/'`buddy.c
+
+libjabber_la-jabber_wb.lo: jabber_wb.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libjabber_la_CFLAGS) $(CFLAGS) -MT libjabber_la-jabber_wb.lo -MD -MP -MF $(DEPDIR)/libjabber_la-jabber_wb.Tpo -c -o libjabber_la-jabber_wb.lo `test -f 'jabber_wb.c' || echo '$(srcdir)/'`jabber_wb.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libjabber_la-jabber_wb.Tpo $(DEPDIR)/libjabber_la-jabber_wb.Plo
+@am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='jabber_wb.c' object='libjabber_la-jabber_wb.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libjabber_la_CFLAGS) $(CFLAGS) -c -o libjabber_la-jabber_wb.lo `test -f 'jabber_wb.c' || echo '$(srcdir)/'`jabber_wb.c
+
 
 libjabber_la-bosh.lo: bosh.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libjabber_la_CFLAGS) $(CFLAGS) -MT libjabber_la-bosh.lo -MD -MP -MF $(DEPDIR)/libjabber_la-bosh.Tpo -c -o libjabber_la-bosh.lo `test -f 'bosh.c' || echo '$(srcdir)/'`bosh.c
