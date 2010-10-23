@@ -1737,6 +1737,11 @@ jabber_buddy_cancel_presence_notification(PurpleBlistNode *node,
 	g_free(msg);
 }
 
+static void jabber_wb_blist_node(PurpleBlistNode *node, gpointer data)
+{
+	/* Start the jaber whiteboard with the corresponding user */
+}
+
 static void jabber_buddy_rerequest_auth(PurpleBlistNode *node, gpointer data)
 {
 	PurpleBuddy *buddy;
@@ -1845,6 +1850,14 @@ static GList *jabber_buddy_menu(PurpleBuddy *buddy)
 		                           NULL, NULL);
 		m = g_list_append(m, act);
 	}
+	
+	/* XMPP Whiteboarding: http://xmpp.org/extensions/xep-0113.html 
+	 * This could be qualified by a if stating that the user at other end
+	 * supports whiteboard!
+	 */
+	act = purple_menu_action_new(_("Start Whiteboard"),
+								jabber_wb_blist_node, NULL, NULL);
+	m = g_list_append(m, act);
 
 	if(!(jb->subscription & JABBER_SUB_TO)) {
 		act = purple_menu_action_new(_("(Re-)Request authorization"),
