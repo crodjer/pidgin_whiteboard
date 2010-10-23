@@ -1845,6 +1845,14 @@ static GList *jabber_buddy_menu(PurpleBuddy *buddy)
 		                           NULL, NULL);
 		m = g_list_append(m, act);
 	}
+	
+	/* XMPP Whiteboarding: http://xmpp.org/extensions/xep-0113.html 
+	 * This could be qualified by a if stating that the user at other end
+	 * supports whiteboard!
+	 */
+	act = purple_menu_action_new(_("Start Whiteboard"),
+								NULL, NULL, NULL);
+	m = g_list_append(m, act);
 
 	if(!(jb->subscription & JABBER_SUB_TO)) {
 		act = purple_menu_action_new(_("(Re-)Request authorization"),
