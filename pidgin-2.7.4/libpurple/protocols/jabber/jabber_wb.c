@@ -59,6 +59,7 @@ void jabber_wb_initiate(PurpleConnection *gc, const char *name)
 
 	if(wb == NULL)
 	{
+		purple_debug_info("***WB***", "whiteboard is not null!");
 		/* Insert this 'session' in the list.  At this point, it's only a
 		 * requested session.
 		 */
@@ -70,3 +71,8 @@ void jabber_wb_initiate(PurpleConnection *gc, const char *name)
 	 */
 }
 
+void jabber_wb_start(PurpleWhiteboard *wb)
+{
+	purple_debug_info("***WB***", "calling the jabber wb start function");
+	purple_whiteboard_start(wb);	/* Builds the UI, in place for POC */
+}
