@@ -35,6 +35,7 @@
 #include "iq.h"
 #include "jabber.h"
 #include "chat.h"
+#include "jabber_wb.h"
 #include "disco.h"
 #include "message.h"
 #include "roster.h"
@@ -50,6 +51,25 @@
 #include "ibb.h"
 
 static PurplePlugin *my_protocol = NULL;
+
+static PurpleWhiteboardPrplOps jabber_wb_prpl_ops =
+{
+	jabber_wb_start,
+	NULL,				/* end */
+	NULL,				/* get dim */
+	NULL,				/* set dim */
+	NULL,				/* get brush */
+	NULL,				/* set brush */
+	NULL,				/* send draw list */
+	NULL,				/* clear */
+
+	/* padding */
+	NULL,
+	NULL,
+	NULL,
+	NULL
+};
+
 
 static PurplePluginProtocolInfo prpl_info =
 {
@@ -116,7 +136,7 @@ static PurplePluginProtocolInfo prpl_info =
 	jabber_si_xfer_send,			/* send_file */
 	jabber_si_new_xfer,				/* new_xfer */
 	jabber_offline_message,			/* offline_message */
-	NULL,							/* whiteboard_prpl_ops */
+	&jabber_wb_prpl_ops,			/* whiteboard_prpl_ops */
 	jabber_prpl_send_raw,			/* send_raw */
 	jabber_roomlist_room_serialize, /* roomlist_room_serialize */
 	jabber_unregister_account,		/* unregister_user */

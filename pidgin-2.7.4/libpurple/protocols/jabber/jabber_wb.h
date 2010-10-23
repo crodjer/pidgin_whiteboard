@@ -32,4 +32,5 @@
 #include "cmds.h"
 
 void jabber_wb_initiate(PurpleConnection *gc, const char *name);
+void jabber_wb_start(PurpleWhiteboard *wb);
 #endif
