@@ -1737,6 +1737,11 @@ jabber_buddy_cancel_presence_notification(PurpleBlistNode *node,
 	g_free(msg);
 }
 
+static void jabber_wb_blist_node(PurpleBlistNode *node, gpointer data)
+{
+	/* Start the jaber whiteboard with the corresponding user */
+}
+
 static void jabber_buddy_rerequest_auth(PurpleBlistNode *node, gpointer data)
 {
 	PurpleBuddy *buddy;
@@ -1851,7 +1856,7 @@ static GList *jabber_buddy_menu(PurpleBuddy *buddy)
 	 * supports whiteboard!
 	 */
 	act = purple_menu_action_new(_("Start Whiteboard"),
-								NULL, NULL, NULL);
+								jabber_wb_blist_node, NULL, NULL);
 	m = g_list_append(m, act);
 
 	if(!(jb->subscription & JABBER_SUB_TO)) {
