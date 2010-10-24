@@ -1,0 +1,25 @@
+Pidgin/Jabber Support for Whiteboarding using shared XML objects
+
+Idea
+
+Pidgin presently supports a basic support for Yahoo! Doodling, and has code hooked for slic10 protocol too.[ Haven't checked out it's workability ]. Jabber protocol runs the most used IM service, GoogleTalk, which is true for some geographical parts, including, INDIA, from where we have decided to implement the same in Pidgin.
+
+This project involves building a basic implementation of the protocol specified in, http://xmpp.org/extensions/inbox/sxe.html, using the SVG graphics specified in, http://www.w3.org/2000/svg. Both together defines the standards for our work.
+
+We hope to provide the following features:
+
+* Simple whiteboarding drawing Lines, Polygons, Circles and Free Curves.
+* Fancy Texting
+* Image Sending
+
+This will provide users with a more enriching experience.
+
+People
+
+We are a group of three students from Indian Institute of Technology, Kharagpur[ India ].It was my idea to implement the whiteboard, I strongly feel that Open Source can be great when you are clear with the idea[ in short don't need a software consultant telling you what you tell him ;) ].
+
+Contacts
+
+Sanket( author ): sanket@sanketagarwal.com
+Rohan: rohanjain.kgp@gmail.com
+Pankaj: singh.pankaj.iitkgp@gmail.com
