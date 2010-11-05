@@ -30,7 +30,10 @@
  *****************************************************************************/
 #include "whiteboard.h"
 #include "cmds.h"
+#include "message.h"
 
+PurpleWhiteboard *jabber_wb_create(PurpleAccount *account, char *to);
 void jabber_wb_initiate(PurpleConnection *gc, const char *name);
+xmlnode *jabber_wb_message_new(PurpleConnection *gc, const char *to, const char *sid);
 void jabber_wb_start(PurpleWhiteboard *wb);
 #endif

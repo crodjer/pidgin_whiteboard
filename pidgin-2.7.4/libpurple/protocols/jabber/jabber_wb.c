@@ -42,28 +42,35 @@
 #include "version.h"
 
 #include "jabber.h"
-
+#include "iq.h"
+#include "message.h"
 #include "whiteboard.h"
 #include "jabber_wb.h"
 
 void jabber_wb_initiate(PurpleConnection *gc, const char *name)
 {
 	PurpleAccount *account;
-	char *to = (char*)name;
 	PurpleWhiteboard *wb;
+	JabberStream *js = purple_connection_get_protocol_data(gc);
+	xmlnode *message;
+	gchar *sid = NULL;
+	char *to = (char*)name;
 	g_return_if_fail(gc);
 	g_return_if_fail(name);
-
 	account = purple_connection_get_account(gc);
 	wb = purple_whiteboard_get_session(account, to);
-
 	if(wb == NULL)
 	{
-		purple_debug_info("***WB***", "whiteboard is not null!");
+		sid = jabber_get_next_id(js);
+		purple_debug_info("jabber-wb", "Initiating a new whiteboard session.\n");
+		message = jabber_wb_message_new(gc, to, sid);
+		if (message){
+			jabber_send(js, message);
+		}
+		//wb = purple_whiteboard_create(account, to);
 		/* Insert this 'session' in the list.  At this point, it's only a
 		 * requested session.
 		 */
-		wb = purple_whiteboard_create(account, to, 0);
 	}
 
 	/* NOTE Perhaps some careful handling of remote assumed established
@@ -71,8 +78,46 @@ void jabber_wb_initiate(PurpleConnection *gc, const char *name)
 	 */
 }
 
+PurpleWhiteboard *jabber_wb_create(PurpleAccount *account, char *to)
+{
+	PurpleWhiteboard *wb;
+	purple_debug_info("jabber-wb", "Createing a jabber whiteboard\n");
+	wb = purple_whiteboard_create(account, to, 0);
+	return wb;
+}
+
+xmlnode *jabber_wb_message_new(PurpleConnection *gc, const char *to, const char *sid){
+	JabberStream *js = purple_connection_get_protocol_data(gc);
+	JabberBuddy *jb;
+	JabberBuddyResource *jbr;
+	xmlnode *message, *child;
+	gchar *resource = NULL, *me = NULL,  *who = NULL;
+	jb = jabber_buddy_find(js, to, FALSE);
+	if (!jb) {
+		purple_debug_error("jabber-wb", "Could not find Jabber buddy\n");
+		return NULL;
+	}
+	resource = jabber_get_resource(to);
+	jbr = jabber_buddy_find_resource(jb, resource);
+	g_free(resource);
+	if (!jbr) {
+		purple_debug_error("jabber-wb", "Could not find buddy's resource\n");
+		return NULL;
+	}
+	who = g_strdup_printf("%s/%s", to, jbr->name);
+	me = g_strdup_printf("%s@%s/%s", js->user->node, js->user->domain, js->user->resource);
+	message = xmlnode_new("message");
+	xmlnode_set_attrib(message, "type", "chat");
+	xmlnode_set_attrib(message, "id", sid);
+	xmlnode_set_attrib(message, "to", who);
+	xmlnode_set_attrib(message, "from", me);
+	xmlnode_new_child(message, "whiteboard");
+	child = xmlnode_get_child(message, "whiteboard");
+	xmlnode_set_attrib(child, "action", "initiate");
+	return message;
+}
 void jabber_wb_start(PurpleWhiteboard *wb)
 {
-	purple_debug_info("***WB***", "calling the jabber wb start function");
+	purple_debug_info("jabber-wb", "calling the jabber wb start function\n");
 	purple_whiteboard_start(wb);	/* Builds the UI, in place for POC */
 }
