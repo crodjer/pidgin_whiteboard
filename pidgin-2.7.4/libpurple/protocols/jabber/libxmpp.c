@@ -52,7 +52,7 @@
 
 static PurplePlugin *my_protocol = NULL;
 
-static PurpleWhiteboardPrplOps jabber_whiteboard_prpl_ops =
+static PurpleWhiteboardPrplOps jabber_wb_prpl_ops =
 {
 	jabber_wb_start,
 	NULL,				/* end */
@@ -136,7 +136,7 @@ static PurplePluginProtocolInfo prpl_info =
 	jabber_si_xfer_send,			/* send_file */
 	jabber_si_new_xfer,				/* new_xfer */
 	jabber_offline_message,			/* offline_message */
-	&jabber_whiteboard_prpl_ops,			/* whiteboard_prpl_ops */
+	&jabber_wb_prpl_ops,			/* whiteboard_prpl_ops */
 	jabber_prpl_send_raw,			/* send_raw */
 	jabber_roomlist_room_serialize, /* roomlist_room_serialize */
 	jabber_unregister_account,		/* unregister_user */
