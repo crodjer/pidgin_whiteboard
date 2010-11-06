@@ -32,8 +32,25 @@
 #include "cmds.h"
 #include "message.h"
 
+
+typedef struct _JabberWbMessage {
+	JabberMessage *jm;
+	enum {
+			JABBER_WB_INITIATE,
+			JABBER_WB_ACCEPT,
+			JABBER_WB_UPDATE,
+			JABBER_WB_TERMINATE,
+		}action;
+	char *data;
+}JabberWbMessage;
+
+void handle_wb_initiate(JabberWbMessage *jwm);
+void handle_wb_accept(JabberWbMessage *jwm);
+void jabber_wb_accept(JabberWbMessage *jwm, const char *name);
 PurpleWhiteboard *jabber_wb_create(PurpleAccount *account, char *to);
 void jabber_wb_initiate(PurpleConnection *gc, const char *name);
 xmlnode *jabber_wb_message_new(PurpleConnection *gc, const char *to, const char *sid);
+PurpleConnection *jabber_wb_message_get_connection(JabberWbMessage *jwm);
+void jabber_wb_message_parse(JabberMessage *jm, xmlnode *packet);
 void jabber_wb_start(PurpleWhiteboard *wb);
 #endif
