@@ -36,6 +36,7 @@
 #include "pep.h"
 #include "smiley.h"
 #include "iq.h"
+#include "jabber_wb.h"
 
 #include <string.h>
 
@@ -770,6 +771,10 @@ void jabber_message_parse(JabberStream *js, xmlnode *packet)
 					&& purple_strequal(node, "http://jabber.org/protocol/commands")) {
 				jabber_adhoc_got_list(js, jm->from, child);
 			}
+		} else if(!strcmp(child->name, "whiteboard")) {
+			jabber_wb_message_parse(jm, packet);
+			jabber_message_free(jm);
+			return;
 		}
 	}
 
