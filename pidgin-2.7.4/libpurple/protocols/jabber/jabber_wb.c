@@ -95,21 +95,14 @@ PurpleWhiteboard *jabber_wb_create(PurpleAccount *account, char *to) {
 void jabber_wb_initiate(PurpleConnection *gc, const char *name) {
 	PurpleAccount *account;
 	PurpleWhiteboard *wb;
-	//JabberStream *js = purple_connection_get_protocol_data(gc);
-	//gchar *sid = NULL;
 	char *to = (char*) name;
 	g_return_if_fail(gc);
 	g_return_if_fail(name);
 	account = purple_connection_get_account(gc);
 	wb = purple_whiteboard_get_session(account, to);
 	if (wb == NULL) {
-		//sid = jabber_get_next_id(js);
 		purple_debug_info("jabber-wb", "Initiating a new whiteboard session.\n");
 		jabber_wb_send_generic(gc, to, "initiate", "");
-		//wb = purple_whiteboard_create(account, to);
-		/* Insert this 'session' in the list.  At this point, it's only a
-		 * requested session.
-		 */
 	}
 
 	/* NOTE Perhaps some careful handling of remote assumed established
@@ -185,10 +178,8 @@ void jabber_wb_message_parse(JabberMessage *jm, xmlnode *packet) {
 			handle_wb_accept(jwm);
 			break;
 		case JABBER_WB_DRAW:
-			//jabber_wb_command_got_draw(jwm);
 			break;
 		case JABBER_WB_CLEAR:
-			//handle_wb_got_clear(jwm);
 			break;
 		case JABBER_WB_END:
 			break;
