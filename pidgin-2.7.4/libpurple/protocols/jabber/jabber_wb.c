@@ -61,6 +61,44 @@ void handle_wb_accept(JabberWbMessage *jwm)
 	}
 }
 
+void handle_wb_clear(JabberWbMessage *jwm)
+{
+	PurpleAccount *account;
+	PurpleWhiteboard *wb;
+	PurpleConnection *gc = jabber_wb_message_get_connection(jwm);
+	purple_debug_info("jabber-wb", "Got Clear (%s)\n", jwm->jm->from);
+	account = purple_connection_get_account(gc);
+	/* Only handle this if local client requested Doodle session (else local
+	 * client would have sent one)
+	 */
+	wb = purple_whiteboard_get_session(account, jwm->jm->from);
+	if(wb == NULL)
+		return;
+
+	if(wb->state == JABBER_WB_STATE_ESTABLISHED)
+	{
+		/* TODO Ask user whether to save the image before clearing it */
+		purple_whiteboard_clear(wb);
+	}
+}
+
+void handle_wb_end(JabberWbMessage *jwm)
+{
+	PurpleAccount *account;
+	PurpleWhiteboard *wb;
+	PurpleConnection *gc = jabber_wb_message_get_connection(jwm);
+	g_return_if_fail(jwm->jm->from != NULL);
+	purple_debug_info("jabber-wb", "Got End (%s)\n", jwm->jm->from);
+	account = purple_connection_get_account(gc);
+	wb = purple_whiteboard_get_session(account, jwm->jm->from);
+	if(wb == NULL)
+		return;
+	if (wb->state==JABBER_WB_STATE_ESTABLISHED){
+		wb->state==JABBER_WB_STATE_CANCELLED;
+		purple_whiteboard_destroy(wb);
+	}
+}
+
 void handle_wb_initiate(JabberWbMessage *jwm)
 {
 	purple_debug_info("jabber-wb", "Handling Wb Initiate request\n");
@@ -97,6 +135,14 @@ static char *jabber_wb_build_draw_string(wb_session *wbs, GList *draw_list)
 	}
 	g_string_append_c(message, '"');
 	return g_string_free(message, FALSE);
+
+}
+
+void jabber_wb_clear(PurpleWhiteboard *wb)
+{
+	PurpleConnection *gc = purple_account_get_connection(wb->account);
+	if (gc && wb->state==JABBER_WB_STATE_ESTABLISHED)
+		jabber_wb_send_generic(gc, wb->who, "clear", "");
 
 }
 
@@ -156,13 +202,15 @@ static void jabber_wb_command_got_draw(JabberWbMessage *jwm)
 	g_list_free(d_list);
 }
 
-PurpleWhiteboard *jabber_wb_create(PurpleAccount *account, char *to) {
+PurpleWhiteboard *jabber_wb_create(PurpleAccount *account, char *to)
+{
 	PurpleWhiteboard *wb;
 	wb_session *wbs = g_new0(wb_session, 1);
 	purple_debug_info("jabber-wb", "Createing a new jabber whiteboard session.\n");
 	wb = purple_whiteboard_create(account, to, 0);
+	wb->state=JABBER_WB_STATE_ESTABLISHED;
 	wb->proto_data = wbs;
-	jabber_wb_set_brush(wb, JABBER_WB_BRUSH_MEDIUM, JABBER_WB_COLOR_CYAN);
+	jabber_wb_set_default_brush(wb);
 	return wb;
 }
 
@@ -206,6 +254,15 @@ void jabber_wb_draw_stroke(PurpleWhiteboard *wb, GList *draw_list)
 	}
 }
 
+void jabber_wb_end(PurpleWhiteboard *wb)
+{
+	PurpleConnection *gc = purple_account_get_connection(wb->account);
+	if (gc && wb->state==JABBER_WB_STATE_ESTABLISHED)
+		jabber_wb_send_generic(gc, wb->who, "end", "");
+	g_free(wb->proto_data);
+
+}
+
 void jabber_wb_get_brush(const PurpleWhiteboard *wb, int *size, int *color)
 {
 	wb_session *wbs = wb->proto_data;
@@ -213,7 +270,8 @@ void jabber_wb_get_brush(const PurpleWhiteboard *wb, int *size, int *color)
 	*color = wbs->brush_color;
 }
 
-void jabber_wb_initiate(PurpleConnection *gc, const char *name) {
+void jabber_wb_initiate(PurpleConnection *gc, const char *name)
+{
 	PurpleAccount *account;
 	PurpleWhiteboard *wb;
 	char *to = (char*) name;
@@ -231,11 +289,13 @@ void jabber_wb_initiate(PurpleConnection *gc, const char *name) {
 	 */
 }
 
-PurpleConnection *jabber_wb_message_get_connection(JabberWbMessage *jwm) {
+PurpleConnection *jabber_wb_message_get_connection(JabberWbMessage *jwm)
+{
 	return jwm->jm->js->gc;
 }
 
-void jabber_wb_message_parse(JabberMessage *jm, xmlnode *packet) {
+void jabber_wb_message_parse(JabberMessage *jm, xmlnode *packet)
+{
 	xmlnode *child;
 	gchar *action;
 	JabberWbMessage *jwm;
@@ -256,7 +316,7 @@ void jabber_wb_message_parse(JabberMessage *jm, xmlnode *packet) {
 		jwm->action = JABBER_WB_END;
 	}
 	purple_debug_info("jabber-wb",
-			"Sent a whiteboard message, Buddy: %s, Data: %s, Action: %s\n",
+			"Whiteboard message, Buddy: %s, Data: %s, Action: %s\n",
 			jwm->jm->to, jwm->data, action);
 	switch (jwm->action) {
 		case JABBER_WB_INITIATE:
@@ -269,9 +329,10 @@ void jabber_wb_message_parse(JabberMessage *jm, xmlnode *packet) {
 			jabber_wb_command_got_draw(jwm);
 			break;
 		case JABBER_WB_CLEAR:
-			//handle_wb_got_clear(jwm);
+			handle_wb_clear(jwm);
 			break;
 		case JABBER_WB_END:
+			handle_wb_end(jwm);
 			break;
 	}
 }
@@ -331,7 +392,14 @@ void jabber_wb_set_brush(PurpleWhiteboard *wb, int size, int color)
 	purple_whiteboard_set_brush(wb, size, color);
 }
 
-void jabber_wb_start(PurpleWhiteboard *wb) {
+void jabber_wb_set_default_brush(PurpleWhiteboard *wb)
+{
+	jabber_wb_set_brush(wb, JABBER_WB_BRUSH_MEDIUM, JABBER_WB_COLOR_GREEN);
+}
+
+
+void jabber_wb_start(PurpleWhiteboard *wb)
+{
 	purple_debug_info("jabber-wb", "calling the jabber wb start function\n");
 	purple_whiteboard_start(wb); /* Builds the UI, in place for POC */
 }
