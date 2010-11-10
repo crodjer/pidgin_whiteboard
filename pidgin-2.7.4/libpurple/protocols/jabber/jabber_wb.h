@@ -59,6 +59,13 @@
 
 #define JABBER_WB_MAX_BRUSH_MOTIONS 100
 
+
+#define JABBER_WB_STATE_REQUESTING  0
+#define JABBER_WB_STATE_REQUESTED   1
+#define JABBER_WB_STATE_ESTABLISHED 2
+#define JABBER_WB_STATE_CANCELLED    3
+
+
 typedef struct _JabberWbMessage {
 	JabberMessage *jm;
 	enum {
@@ -78,19 +85,23 @@ typedef struct _wb_session
 } wb_session;
 
 
-void handle_wb_initiate(JabberWbMessage *jwm);
 void handle_wb_accept(JabberWbMessage *jwm);
+void handle_wb_end(JabberWbMessage *jwm);
+void handle_wb_initiate(JabberWbMessage *jwm);
 void jabber_wb_accept(JabberWbMessage *jwm, const char *name);
+static char *jabber_wb_build_draw_string(wb_session *ds, GList *draw_list);
+void jabber_wb_clear(PurpleWhiteboard *wb);
 static void jabber_wb_command_got_draw(JabberWbMessage *jwm);
 PurpleWhiteboard *jabber_wb_create(PurpleAccount *account, char *to);
 void jabber_wb_draw_stroke(PurpleWhiteboard *wb, GList *draw_list);
-static char *jabber_wb_build_draw_string(wb_session *ds, GList *draw_list);
+void jabber_wb_end(PurpleWhiteboard *wb);
 void jabber_wb_get_brush(const PurpleWhiteboard *wb, int *size, int *color);
 void jabber_wb_initiate(PurpleConnection *gc, const char *name);
 PurpleConnection *jabber_wb_message_get_connection(JabberWbMessage *jwm);
 void jabber_wb_message_parse(JabberMessage *jm, xmlnode *packet);
-void jabber_wb_set_brush(PurpleWhiteboard *wb, int size, int color);
 void jabber_wb_send_generic(PurpleConnection *gc, const char *to, const char *action, const char *data);
 void jabber_wb_send_draw_list(PurpleWhiteboard *wb, GList *draw_list);
+void jabber_wb_set_brush(PurpleWhiteboard *wb, int size, int color);
+void jabber_wb_set_default_brush(PurpleWhiteboard *wb);
 void jabber_wb_start(PurpleWhiteboard *wb);
 #endif

@@ -55,13 +55,13 @@ static PurplePlugin *my_protocol = NULL;
 static PurpleWhiteboardPrplOps jabber_wb_prpl_ops =
 {
 	jabber_wb_start,
-	NULL,				/* end */
+	jabber_wb_end,				/* end */
 	NULL,				/* get dim */
 	NULL,				/* set dim */
 	NULL,				/* get brush */
 	jabber_wb_set_brush,				/* set brush */
 	jabber_wb_send_draw_list,				/* send draw list */
-	NULL,				/* clear */
+	jabber_wb_clear,				/* clear */
 
 	/* padding */
 	NULL,
