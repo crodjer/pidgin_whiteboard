@@ -59,8 +59,8 @@ static PurpleWhiteboardPrplOps jabber_wb_prpl_ops =
 	NULL,				/* get dim */
 	NULL,				/* set dim */
 	NULL,				/* get brush */
-	NULL,				/* set brush */
-	NULL,				/* send draw list */
+	jabber_wb_set_brush,				/* set brush */
+	jabber_wb_send_draw_list,				/* send draw list */
 	NULL,				/* clear */
 
 	/* padding */

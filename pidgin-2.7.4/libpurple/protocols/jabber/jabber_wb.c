@@ -65,6 +65,62 @@ void handle_wb_accept(JabberWbMessage *jwm) {
 	}
 }
 
+static void jabber_wb_command_got_draw(JabberWbMessage *jwm)
+{
+	PurpleAccount *account;
+	PurpleWhiteboard *wb;
+	char **tokens, *from = jwm->jm->from, *message = jwm->data;
+	int i;
+	PurpleConnection *gc = jabber_wb_message_get_connection(jwm);
+	GList *d_list = NULL; /* a local list of drawing info */
+
+	g_return_if_fail(message != NULL);
+
+	purple_debug_info("jabber-wb", "Got Draw (%s)\n", from);
+	purple_debug_info("jabber-wb", "Draw message: %s\n", message);
+
+	account = purple_connection_get_account(gc);
+
+	/* Only handle this if local client requested whiteboard session (else local
+	 * client would have sent one)
+	 */
+	wb = purple_whiteboard_get_session(account, from);
+
+	if (wb == NULL)
+		return;
+
+	/* TODO Functionalize
+	 * Convert drawing packet message to an integer list
+	 */
+
+	/* Check to see if the message begans and ends with quotes */
+	if ((message[0] != '\"') || (message[strlen(message) - 1] != '\"'))
+		return;
+
+	/* Ignore the inital quotation mark. */
+	message += 1;
+
+	tokens = g_strsplit(message, ",", 0);
+
+	/* Traverse and extract all integers divided by commas */
+	for (i = 0; tokens[i] != NULL; i++) {
+		int last = strlen(tokens[i]) - 1;
+		if (tokens[i][last] == '"')
+			tokens[i][last] = '\0';
+
+		d_list = g_list_prepend(d_list, GINT_TO_POINTER(atoi(tokens[i])));
+	}
+	d_list = g_list_reverse(d_list);
+
+	g_strfreev(tokens);
+
+	jabber_wb_draw_stroke(wb, d_list);
+
+	/* goodle_doodle_session_set_canvas_as_icon(ds); */
+
+	g_list_free(d_list);
+}
+
 void jabber_wb_accept(JabberWbMessage *jwm, const char *name)
 {
 	PurpleAccount *account;
@@ -79,6 +135,92 @@ void jabber_wb_accept(JabberWbMessage *jwm, const char *name)
 		wb = jabber_wb_create(account, to);
 		jabber_wb_send_generic(gc, to, "accept", "");
 	}
+}
+
+static char *jabber_wb_build_draw_string(wb_session *wbs, GList *draw_list)
+{
+	GString *message;
+
+	g_return_val_if_fail(draw_list != NULL, NULL);
+
+	message = g_string_new("");
+	g_string_printf(message, "\"%d,%d", wbs->brush_color, wbs->brush_size);
+
+	for (; draw_list != NULL; draw_list = draw_list->next) {
+		g_string_append_printf(message, ",%d", GPOINTER_TO_INT(draw_list->data));
+	}
+	g_string_append_c(message, '"');
+	return g_string_free(message, FALSE);
+
+}
+
+void jabber_wb_send_draw_list(PurpleWhiteboard *wb, GList *draw_list)
+{
+	char *message;
+	wb_session *wbs = wb->proto_data;
+	purple_debug_info("jabber-wb", "Send draw list is called.\n");
+	g_return_if_fail(draw_list != NULL);
+	message = jabber_wb_build_draw_string(wbs, draw_list);
+	jabber_wb_send_generic(wb->account->gc, wb->who, "draw", message);
+	g_free(message);
+
+}
+
+/* Traverse through the list and draw the points and lines */
+void jabber_wb_draw_stroke(PurpleWhiteboard *wb, GList *draw_list)
+{
+	int brush_color;
+	int brush_size;
+	int x;
+	int y;
+
+	g_return_if_fail(draw_list != NULL);
+
+	brush_color = GPOINTER_TO_INT(draw_list->data);
+	draw_list = draw_list->next;
+	g_return_if_fail(draw_list != NULL);
+
+	brush_size = GPOINTER_TO_INT(draw_list->data);
+	draw_list = draw_list->next;
+	g_return_if_fail(draw_list != NULL);
+
+	x = GPOINTER_TO_INT(draw_list->data);
+	draw_list = draw_list->next;
+	g_return_if_fail(draw_list != NULL);
+
+	y = GPOINTER_TO_INT(draw_list->data);
+	draw_list = draw_list->next;
+	g_return_if_fail(draw_list != NULL);
+
+	while (draw_list != NULL && draw_list->next != NULL) {
+		int dx = GPOINTER_TO_INT(draw_list->data);
+		int dy = GPOINTER_TO_INT(draw_list->next->data);
+
+		purple_whiteboard_draw_line(wb, x, y, x + dx, y + dy, brush_color,
+				brush_size);
+
+		x += dx;
+		y += dy;
+
+		draw_list = draw_list->next->next;
+	}
+}
+
+void jabber_wb_get_brush(const PurpleWhiteboard *wb, int *size, int *color)
+{
+	wb_session *wbs = wb->proto_data;
+	*size = wbs->brush_size;
+	*color = wbs->brush_color;
+}
+
+void jabber_wb_set_brush(PurpleWhiteboard *wb, int size, int color)
+{
+	wb_session *wbs = wb->proto_data;
+	wbs->brush_size = size;
+	wbs->brush_color = color;
+
+	/* Notify the core about the changes */
+	purple_whiteboard_set_brush(wb, size, color);
 }
 
 PurpleWhiteboard *jabber_wb_create(PurpleAccount *account, char *to) {
@@ -178,8 +320,10 @@ void jabber_wb_message_parse(JabberMessage *jm, xmlnode *packet) {
 			handle_wb_accept(jwm);
 			break;
 		case JABBER_WB_DRAW:
+			jabber_wb_command_got_draw(jwm);
 			break;
 		case JABBER_WB_CLEAR:
+			//handle_wb_got_clear(jwm);
 			break;
 		case JABBER_WB_END:
 			break;
