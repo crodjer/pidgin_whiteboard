@@ -47,12 +47,8 @@
 #include "whiteboard.h"
 #include "jabber_wb.h"
 
-void handle_wb_initiate(JabberWbMessage *jwm) {
-	purple_debug_info("jabber-wb", "Handling Wb Initiate request\n");
-	jabber_wb_accept(jwm, jwm->jm->from);
-}
-
-void handle_wb_accept(JabberWbMessage *jwm) {
+void handle_wb_accept(JabberWbMessage *jwm)
+{
 	PurpleAccount *account;
 	PurpleWhiteboard *wb;
 	PurpleConnection *gc = jabber_wb_message_get_connection(jwm);
@@ -63,6 +59,45 @@ void handle_wb_accept(JabberWbMessage *jwm) {
 	if (wb == NULL) {
 		wb = jabber_wb_create(account, to);
 	}
+}
+
+void handle_wb_initiate(JabberWbMessage *jwm)
+{
+	purple_debug_info("jabber-wb", "Handling Wb Initiate request\n");
+	jabber_wb_accept(jwm, jwm->jm->from);
+}
+
+void jabber_wb_accept(JabberWbMessage *jwm, const char *name)
+{
+	PurpleAccount *account;
+	PurpleWhiteboard *wb;
+	PurpleConnection *gc = jabber_wb_message_get_connection(jwm);
+	char *to = (char*) name;
+	g_return_if_fail(gc);
+	g_return_if_fail(name);
+	account = purple_connection_get_account(gc);
+	wb = purple_whiteboard_get_session(account, to);
+	if (wb == NULL) {
+		wb = jabber_wb_create(account, to);
+		jabber_wb_send_generic(gc, to, "accept", "");
+	}
+}
+
+static char *jabber_wb_build_draw_string(wb_session *wbs, GList *draw_list)
+{
+	GString *message;
+
+	g_return_val_if_fail(draw_list != NULL, NULL);
+
+	message = g_string_new("");
+	g_string_printf(message, "\"%d,%d", wbs->brush_color, wbs->brush_size);
+
+	for (; draw_list != NULL; draw_list = draw_list->next) {
+		g_string_append_printf(message, ",%d", GPOINTER_TO_INT(draw_list->data));
+	}
+	g_string_append_c(message, '"');
+	return g_string_free(message, FALSE);
+
 }
 
 static void jabber_wb_command_got_draw(JabberWbMessage *jwm)
@@ -121,49 +156,14 @@ static void jabber_wb_command_got_draw(JabberWbMessage *jwm)
 	g_list_free(d_list);
 }
 
-void jabber_wb_accept(JabberWbMessage *jwm, const char *name)
-{
-	PurpleAccount *account;
+PurpleWhiteboard *jabber_wb_create(PurpleAccount *account, char *to) {
 	PurpleWhiteboard *wb;
-	PurpleConnection *gc = jabber_wb_message_get_connection(jwm);
-	char *to = (char*) name;
-	g_return_if_fail(gc);
-	g_return_if_fail(name);
-	account = purple_connection_get_account(gc);
-	wb = purple_whiteboard_get_session(account, to);
-	if (wb == NULL) {
-		wb = jabber_wb_create(account, to);
-		jabber_wb_send_generic(gc, to, "accept", "");
-	}
-}
-
-static char *jabber_wb_build_draw_string(wb_session *wbs, GList *draw_list)
-{
-	GString *message;
-
-	g_return_val_if_fail(draw_list != NULL, NULL);
-
-	message = g_string_new("");
-	g_string_printf(message, "\"%d,%d", wbs->brush_color, wbs->brush_size);
-
-	for (; draw_list != NULL; draw_list = draw_list->next) {
-		g_string_append_printf(message, ",%d", GPOINTER_TO_INT(draw_list->data));
-	}
-	g_string_append_c(message, '"');
-	return g_string_free(message, FALSE);
-
-}
-
-void jabber_wb_send_draw_list(PurpleWhiteboard *wb, GList *draw_list)
-{
-	char *message;
-	wb_session *wbs = wb->proto_data;
-	purple_debug_info("jabber-wb", "Send draw list is called.\n");
-	g_return_if_fail(draw_list != NULL);
-	message = jabber_wb_build_draw_string(wbs, draw_list);
-	jabber_wb_send_generic(wb->account->gc, wb->who, "draw", message);
-	g_free(message);
-
+	wb_session *wbs = g_new0(wb_session, 1);
+	purple_debug_info("jabber-wb", "Createing a new jabber whiteboard session.\n");
+	wb = purple_whiteboard_create(account, to, 0);
+	wb->proto_data = wbs;
+	jabber_wb_set_brush(wb, JABBER_WB_BRUSH_MEDIUM, JABBER_WB_COLOR_CYAN);
+	return wb;
 }
 
 /* Traverse through the list and draw the points and lines */
@@ -213,27 +213,6 @@ void jabber_wb_get_brush(const PurpleWhiteboard *wb, int *size, int *color)
 	*color = wbs->brush_color;
 }
 
-void jabber_wb_set_brush(PurpleWhiteboard *wb, int size, int color)
-{
-	wb_session *wbs = wb->proto_data;
-	wbs->brush_size = size;
-	wbs->brush_color = color;
-
-	/* Notify the core about the changes */
-	purple_whiteboard_set_brush(wb, size, color);
-}
-
-PurpleWhiteboard *jabber_wb_create(PurpleAccount *account, char *to) {
-	PurpleWhiteboard *wb;
-	wb_session *wbs = g_new0(wb_session, 1);
-	purple_debug_info("jabber-wb", "Createing a new jabber whiteboard session.\n");
-	wb = purple_whiteboard_create(account, to, 0);
-	wbs->brush_size = JABBER_WB_BRUSH_MEDIUM;
-	wbs->brush_color = JABBER_WB_COLOR_CYAN;
-	wb->proto_data = wbs;
-	return wb;
-}
-
 void jabber_wb_initiate(PurpleConnection *gc, const char *name) {
 	PurpleAccount *account;
 	PurpleWhiteboard *wb;
@@ -250,39 +229,6 @@ void jabber_wb_initiate(PurpleConnection *gc, const char *name) {
 	/* NOTE Perhaps some careful handling of remote assumed established
 	 * sessions
 	 */
-}
-
-void jabber_wb_send_generic(PurpleConnection *gc, const char *to, const char *action, const char *data)
-{
-	JabberStream *js = purple_connection_get_protocol_data(gc);
-	JabberBuddy *jb;
-	JabberBuddyResource *jbr;
-	xmlnode *message, *child;
-	gchar *resource = NULL, *me = NULL, *who = NULL;
-	jb = jabber_buddy_find(js, to, FALSE);
-	if (!jb) {
-		purple_debug_error("jabber-wb", "Could not find Jabber buddy\n");
-		return;
-	}
-	resource = jabber_get_resource(to);
-	jbr = jabber_buddy_find_resource(jb, resource);
-	g_free(resource);
-	if (!jbr) {
-		purple_debug_error("jabber-wb", "Could not find buddy's resource\n");
-		return;
-	}
-	who = g_strdup_printf("%s/%s", to, jbr->name);
-	me = g_strdup_printf("%s@%s/%s", js->user->node, js->user->domain,
-			js->user->resource);
-	message = xmlnode_new("message");
-	xmlnode_set_attrib(message, "type", "chat");
-	xmlnode_set_attrib(message, "id", jabber_get_next_id(js));
-	xmlnode_set_attrib(message, "to", who);
-	xmlnode_set_attrib(message, "from", me);
-	child = xmlnode_new_child(message, "whiteboard");
-	xmlnode_set_attrib(child, "action", action);
-	xmlnode_insert_data(child,data,strlen(data));
-	jabber_send(js, message);
 }
 
 PurpleConnection *jabber_wb_message_get_connection(JabberWbMessage *jwm) {
@@ -329,6 +275,62 @@ void jabber_wb_message_parse(JabberMessage *jm, xmlnode *packet) {
 			break;
 	}
 }
+
+void jabber_wb_send_generic(PurpleConnection *gc, const char *to, const char *action, const char *data)
+{
+	JabberStream *js = purple_connection_get_protocol_data(gc);
+	JabberBuddy *jb;
+	JabberBuddyResource *jbr;
+	xmlnode *message, *child;
+	gchar *resource = NULL, *me = NULL, *who = NULL;
+	jb = jabber_buddy_find(js, to, FALSE);
+	if (!jb) {
+		purple_debug_error("jabber-wb", "Could not find Jabber buddy\n");
+		return;
+	}
+	resource = jabber_get_resource(to);
+	jbr = jabber_buddy_find_resource(jb, resource);
+	g_free(resource);
+	if (!jbr) {
+		purple_debug_error("jabber-wb", "Could not find buddy's resource\n");
+		return;
+	}
+	who = g_strdup_printf("%s/%s", to, jbr->name);
+	me = g_strdup_printf("%s@%s/%s", js->user->node, js->user->domain,
+			js->user->resource);
+	message = xmlnode_new("message");
+	xmlnode_set_attrib(message, "type", "chat");
+	xmlnode_set_attrib(message, "id", jabber_get_next_id(js));
+	xmlnode_set_attrib(message, "to", who);
+	xmlnode_set_attrib(message, "from", me);
+	child = xmlnode_new_child(message, "whiteboard");
+	xmlnode_set_attrib(child, "action", action);
+	xmlnode_insert_data(child,data,strlen(data));
+	jabber_send(js, message);
+}
+
+void jabber_wb_send_draw_list(PurpleWhiteboard *wb, GList *draw_list)
+{
+	char *message;
+	wb_session *wbs = wb->proto_data;
+	purple_debug_info("jabber-wb", "Send draw list is called.\n");
+	g_return_if_fail(draw_list != NULL);
+	message = jabber_wb_build_draw_string(wbs, draw_list);
+	jabber_wb_send_generic(wb->account->gc, wb->who, "draw", message);
+	g_free(message);
+
+}
+
+void jabber_wb_set_brush(PurpleWhiteboard *wb, int size, int color)
+{
+	wb_session *wbs = wb->proto_data;
+	wbs->brush_size = size;
+	wbs->brush_color = color;
+
+	/* Notify the core about the changes */
+	purple_whiteboard_set_brush(wb, size, color);
+}
+
 void jabber_wb_start(PurpleWhiteboard *wb) {
 	purple_debug_info("jabber-wb", "calling the jabber wb start function\n");
 	purple_whiteboard_start(wb); /* Builds the UI, in place for POC */
