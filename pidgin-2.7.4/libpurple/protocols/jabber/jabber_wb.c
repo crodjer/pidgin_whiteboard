@@ -162,7 +162,7 @@ PurpleWhiteboard *jabber_wb_create(PurpleAccount *account, char *to) {
 	purple_debug_info("jabber-wb", "Createing a new jabber whiteboard session.\n");
 	wb = purple_whiteboard_create(account, to, 0);
 	wb->proto_data = wbs;
-	jabber_wb_set_brush(wb, JABBER_WB_BRUSH_MEDIUM, JABBER_WB_COLOR_CYAN);
+	jabber_wb_set_brush(wb, JABBER_WB_BRUSH_SMALL, JABBER_WB_COLOR_RED);
 	return wb;
 }
 

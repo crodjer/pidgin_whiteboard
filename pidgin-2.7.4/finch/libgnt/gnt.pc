@@ -1,0 +1,14 @@
+prefix=/usr/local
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+datarootdir=${prefix}/share
+datadir=${datarootdir}
+sysconfdir=${prefix}/etc
+ 
+Name: LibGNT
+Description: Glib Ncurses Toolkit is a collection of curses-widgets.
+Version: 2.7.4
+Requires: glib-2.0
+Cflags: -I${includedir}/gnt
+Libs: -L${libdir} -lgnt
