@@ -228,9 +228,8 @@ PurpleWhiteboard *jabber_wb_create(PurpleAccount *account, char *to) {
 	wb_session *wbs = g_new0(wb_session, 1);
 	purple_debug_info("jabber-wb", "Createing a new jabber whiteboard session.\n");
 	wb = purple_whiteboard_create(account, to, 0);
-	wbs->brush_size = JABBER_WB_BRUSH_MEDIUM;
-	wbs->brush_color = JABBER_WB_COLOR_CYAN;
 	wb->proto_data = wbs;
+	jabber_wb_set_brush(wb, JABBER_WB_BRUSH_MEDIUM, JABBER_WB_COLOR_CYAN);
 	return wb;
 }
 

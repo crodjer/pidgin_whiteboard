@@ -52,7 +52,7 @@
 
 #define PALETTE_NUM_OF_COLORS 12
 
-/* Doodle brush sizes (most likely variable) */
+/* brush sizes (most likely variable) */
 #define JABBER_WB_BRUSH_SMALL   2
 #define JABBER_WB_BRUSH_MEDIUM  5
 #define JABBER_WB_BRUSH_LARGE  10
