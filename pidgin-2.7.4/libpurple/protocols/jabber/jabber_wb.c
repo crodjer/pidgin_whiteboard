@@ -1,4 +1,6 @@
 /*
+ * @file jabber_wb.c
+ *
  * purple
  *
  * Purple is the legal property of its developers, whose names are too numerous
@@ -32,6 +34,10 @@
 #include "cipher.h"
 #include "cmds.h"
 #include "debug.h"
+#include "jabber.h"
+#include "jabber_wb.h"
+#include "iq.h"
+#include "message.h"
 #include "notify.h"
 #include "privacy.h"
 #include "prpl.h"
@@ -41,11 +47,7 @@
 #include "util.h"
 #include "version.h"
 #include "string.h"
-#include "jabber.h"
-#include "iq.h"
-#include "message.h"
 #include "whiteboard.h"
-#include "jabber_wb.h"
 
 void handle_wb_accept(JabberWbMessage *jwm)
 {
@@ -93,8 +95,9 @@ void handle_wb_end(JabberWbMessage *jwm)
 	wb = purple_whiteboard_get_session(account, jwm->jm->from);
 	if(wb == NULL)
 		return;
-	if (wb->state==JABBER_WB_STATE_ESTABLISHED){
-		wb->state==JABBER_WB_STATE_CANCELLED;
+	if (wb->state==JABBER_WB_STATE_ESTABLISHED)
+	{
+		wb->state=JABBER_WB_STATE_CANCELLED;
 		purple_whiteboard_destroy(wb);
 	}
 }
@@ -102,6 +105,7 @@ void handle_wb_end(JabberWbMessage *jwm)
 void handle_wb_initiate(JabberWbMessage *jwm)
 {
 	purple_debug_info("jabber-wb", "Handling Wb Initiate request\n");
+
 	jabber_wb_accept(jwm, jwm->jm->from);
 }
 
