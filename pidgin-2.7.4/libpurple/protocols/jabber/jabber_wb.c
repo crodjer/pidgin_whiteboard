@@ -1,6 +1,4 @@
 /*
- * @file jabber_wb.c
- *
  * purple
  *
  * Purple is the legal property of its developers, whose names are too numerous
@@ -95,9 +93,8 @@ void handle_wb_end(JabberWbMessage *jwm)
 	wb = purple_whiteboard_get_session(account, jwm->jm->from);
 	if(wb == NULL)
 		return;
-	if (wb->state==JABBER_WB_STATE_ESTABLISHED)
-	{
-		wb->state=JABBER_WB_STATE_CANCELLED;
+	if (wb->state==JABBER_WB_STATE_ESTABLISHED){
+		wb->state==JABBER_WB_STATE_CANCELLED;
 		purple_whiteboard_destroy(wb);
 	}
 }

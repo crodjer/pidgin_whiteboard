@@ -91,8 +91,8 @@ am__libjabber_la_SOURCES_DIST = adhoccommands.c adhoccommands.h auth.c \
 	jingle/jingle.c jingle/jingle.h jingle/content.c \
 	jingle/content.h jingle/iceudp.c jingle/iceudp.h \
 	jingle/rawudp.c jingle/rawudp.h jingle/rtp.c jingle/rtp.h \
-	jingle/session.c jingle/session.h jingle/sxe.c jingle/sxe.h \
-	jingle/transport.c jingle/transport.h jutil.c jutil.h message.c message.h \
+	jingle/session.c jingle/session.h jingle/transport.c \
+	jingle/transport.h jutil.c jutil.h message.c message.h \
 	namespaces.h oob.c oob.h parser.c parser.h pep.c pep.h ping.c \
 	ping.h presence.c presence.h roster.c roster.h si.c si.h \
 	useravatar.c useravatar.h usermood.c usermood.h usernick.c \
@@ -111,7 +111,7 @@ am__objects_2 = libjabber_la-adhoccommands.lo libjabber_la-auth.lo \
 	libjabber_la-jabber.lo libjabber_la-jingle.lo \
 	libjabber_la-content.lo libjabber_la-iceudp.lo \
 	libjabber_la-rawudp.lo libjabber_la-rtp.lo \
-	libjabber_la-session.lo libjabber_la-sxe.lo libjabber_la-transport.lo \
+	libjabber_la-session.lo libjabber_la-transport.lo \
 	libjabber_la-jutil.lo libjabber_la-message.lo \
 	libjabber_la-oob.lo libjabber_la-parser.lo libjabber_la-pep.lo \
 	libjabber_la-ping.lo libjabber_la-presence.lo \
@@ -590,7 +590,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libjabber_la-roster.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libjabber_la-rtp.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libjabber_la-session.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libjabber_la-sxe.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libjabber_la-si.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libjabber_la-transport.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libjabber_la-useravatar.Plo@am__quote@
@@ -848,14 +847,6 @@ libjabber_la-session.lo: jingle/session.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='jingle/session.c' object='libjabber_la-session.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libjabber_la_CFLAGS) $(CFLAGS) -c -o libjabber_la-session.lo `test -f 'jingle/session.c' || echo '$(srcdir)/'`jingle/session.c
-
-libjabber_la-sxe.lo: jingle/sxe.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libjabber_la_CFLAGS) $(CFLAGS) -MT libjabber_la-sxe.lo -MD -MP -MF $(DEPDIR)/libjabber_la-sxe.Tpo -c -o libjabber_la-sxe.lo `test -f 'jingle/sxe.c' || echo '$(srcdir)/'`jingle/sxe.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libjabber_la-sxe.Tpo $(DEPDIR)/libjabber_la-sxe.Plo
-@am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='jingle/sxe.c' object='libjabber_la-sxe.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libjabber_la_CFLAGS) $(CFLAGS) -c -o libjabber_la-sxe.lo `test -f 'jingle/sxe.c' || echo '$(srcdir)/'`jingle/sxe.c
 
 libjabber_la-transport.lo: jingle/transport.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libjabber_la_CFLAGS) $(CFLAGS) -MT libjabber_la-transport.lo -MD -MP -MF $(DEPDIR)/libjabber_la-transport.Tpo -c -o libjabber_la-transport.lo `test -f 'jingle/transport.c' || echo '$(srcdir)/'`jingle/transport.c

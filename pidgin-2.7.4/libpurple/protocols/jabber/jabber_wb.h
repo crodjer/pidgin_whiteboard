@@ -1,5 +1,5 @@
 /**
- * @file jabber_wb.h
+ * @file jabber_wb.h The Yahoo! protocol plugin Doodle IMVironment object
  *
  * purple
  *
@@ -86,11 +86,12 @@ typedef struct _wb_session
 
 
 void handle_wb_accept(JabberWbMessage *jwm);
-void handle_wb_clear(JabberWbMessage *jwm);
 void handle_wb_end(JabberWbMessage *jwm);
 void handle_wb_initiate(JabberWbMessage *jwm);
 void jabber_wb_accept(JabberWbMessage *jwm, const char *name);
+static char *jabber_wb_build_draw_string(wb_session *ds, GList *draw_list);
 void jabber_wb_clear(PurpleWhiteboard *wb);
+static void jabber_wb_command_got_draw(JabberWbMessage *jwm);
 PurpleWhiteboard *jabber_wb_create(PurpleAccount *account, char *to);
 void jabber_wb_draw_stroke(PurpleWhiteboard *wb, GList *draw_list);
 void jabber_wb_end(PurpleWhiteboard *wb);
