@@ -46,6 +46,8 @@ JABBERSOURCES = \
 			  iq.h \
 			  jabber.c \
 			  jabber.h \
+			  jabber_wb.c \
+			  jabber_wb.h \
 			  jingle/jingle.c \
 			  jingle/jingle.h \
 			  jingle/content.c \
