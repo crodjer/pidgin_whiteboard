@@ -80,7 +80,7 @@ am__DEPENDENCIES_1 =
 @STATIC_JABBER_FALSE@	$(am__DEPENDENCIES_1)
 am__libjabber_la_SOURCES_DIST = adhoccommands.c adhoccommands.h auth.c \
 	auth.h auth_digest_md5.c auth_plain.c auth_scram.c \
-	auth_scram.h buddy.c buddy.h jabber_wb.c jabber_wb.h bosh.c bosh.h caps.c caps.h \
+	auth_scram.h buddy.c buddy.h bosh.c bosh.h caps.c caps.h \
 	chat.c chat.h data.c data.h disco.c disco.h google/gmail.c \
 	google/gmail.h google/google.c google/google.h \
 	google/google_presence.c google/google_presence.h \
@@ -88,32 +88,33 @@ am__libjabber_la_SOURCES_DIST = adhoccommands.c adhoccommands.h auth.c \
 	google/google_session.c google/google_session.h \
 	google/jingleinfo.c google/jingleinfo.h google/relay.c \
 	google/relay.h ibb.c ibb.h iq.c iq.h jabber.c jabber.h \
-	jingle/jingle.c jingle/jingle.h jingle/content.c \
-	jingle/content.h jingle/iceudp.c jingle/iceudp.h \
-	jingle/rawudp.c jingle/rawudp.h jingle/rtp.c jingle/rtp.h \
-	jingle/session.c jingle/session.h jingle/transport.c \
-	jingle/transport.h jutil.c jutil.h message.c message.h \
-	namespaces.h oob.c oob.h parser.c parser.h pep.c pep.h ping.c \
-	ping.h presence.c presence.h roster.c roster.h si.c si.h \
-	useravatar.c useravatar.h usermood.c usermood.h usernick.c \
-	usernick.h usertune.c usertune.h xdata.c xdata.h auth_cyrus.c \
-	libxmpp.c
+	jabber_wb.c jabber_wb.h jingle/jingle.c jingle/jingle.h \
+	jingle/content.c jingle/content.h jingle/iceudp.c \
+	jingle/iceudp.h jingle/rawudp.c jingle/rawudp.h jingle/rtp.c \
+	jingle/rtp.h jingle/session.c jingle/session.h \
+	jingle/transport.c jingle/transport.h jutil.c jutil.h \
+	message.c message.h namespaces.h oob.c oob.h parser.c parser.h \
+	pep.c pep.h ping.c ping.h presence.c presence.h roster.c \
+	roster.h si.c si.h useravatar.c useravatar.h usermood.c \
+	usermood.h usernick.c usernick.h usertune.c usertune.h xdata.c \
+	xdata.h auth_cyrus.c libxmpp.c
 @USE_CYRUS_SASL_TRUE@am__objects_1 = libjabber_la-auth_cyrus.lo
 am__objects_2 = libjabber_la-adhoccommands.lo libjabber_la-auth.lo \
 	libjabber_la-auth_digest_md5.lo libjabber_la-auth_plain.lo \
-	libjabber_la-auth_scram.lo libjabber_la-buddy.lo libjabber_la-jabber_wb.lo \
+	libjabber_la-auth_scram.lo libjabber_la-buddy.lo \
 	libjabber_la-bosh.lo libjabber_la-caps.lo libjabber_la-chat.lo \
 	libjabber_la-data.lo libjabber_la-disco.lo \
 	libjabber_la-gmail.lo libjabber_la-google.lo \
 	libjabber_la-google_presence.lo libjabber_la-google_roster.lo \
 	libjabber_la-google_session.lo libjabber_la-jingleinfo.lo \
 	libjabber_la-relay.lo libjabber_la-ibb.lo libjabber_la-iq.lo \
-	libjabber_la-jabber.lo libjabber_la-jingle.lo \
-	libjabber_la-content.lo libjabber_la-iceudp.lo \
-	libjabber_la-rawudp.lo libjabber_la-rtp.lo \
-	libjabber_la-session.lo libjabber_la-transport.lo \
-	libjabber_la-jutil.lo libjabber_la-message.lo \
-	libjabber_la-oob.lo libjabber_la-parser.lo libjabber_la-pep.lo \
+	libjabber_la-jabber.lo libjabber_la-jabber_wb.lo \
+	libjabber_la-jingle.lo libjabber_la-content.lo \
+	libjabber_la-iceudp.lo libjabber_la-rawudp.lo \
+	libjabber_la-rtp.lo libjabber_la-session.lo \
+	libjabber_la-transport.lo libjabber_la-jutil.lo \
+	libjabber_la-message.lo libjabber_la-oob.lo \
+	libjabber_la-parser.lo libjabber_la-pep.lo \
 	libjabber_la-ping.lo libjabber_la-presence.lo \
 	libjabber_la-roster.lo libjabber_la-si.lo \
 	libjabber_la-useravatar.lo libjabber_la-usermood.lo \
@@ -307,8 +308,6 @@ PERL = @PERL@
 PERL_CFLAGS = @PERL_CFLAGS@
 PERL_LIBS = @PERL_LIBS@
 PKG_CONFIG = @PKG_CONFIG@
-PKG_CONFIG_LIBDIR = @PKG_CONFIG_LIBDIR@
-PKG_CONFIG_PATH = @PKG_CONFIG_PATH@
 PLUGINS_DEFINE = @PLUGINS_DEFINE@
 POFILES = @POFILES@
 POSUB = @POSUB@
@@ -423,23 +422,24 @@ EXTRA_DIST = \
 pkgdir = $(libdir)/purple-$(PURPLE_MAJOR_VERSION)
 JABBERSOURCES = adhoccommands.c adhoccommands.h auth.c auth.h \
 	auth_digest_md5.c auth_plain.c auth_scram.c auth_scram.h \
-	buddy.c buddy.h bosh.c bosh.h caps.c caps.h chat.c chat.h jabber_wb.c jabber_wb.h \
+	buddy.c buddy.h bosh.c bosh.h caps.c caps.h chat.c chat.h \
 	data.c data.h disco.c disco.h google/gmail.c google/gmail.h \
 	google/google.c google/google.h google/google_presence.c \
 	google/google_presence.h google/google_roster.c \
 	google/google_roster.h google/google_session.c \
 	google/google_session.h google/jingleinfo.c \
 	google/jingleinfo.h google/relay.c google/relay.h ibb.c ibb.h \
-	iq.c iq.h jabber.c jabber.h jingle/jingle.c jingle/jingle.h \
-	jingle/content.c jingle/content.h jingle/iceudp.c \
-	jingle/iceudp.h jingle/rawudp.c jingle/rawudp.h jingle/rtp.c \
-	jingle/rtp.h jingle/session.c jingle/session.h \
-	jingle/transport.c jingle/transport.h jutil.c jutil.h \
-	message.c message.h namespaces.h oob.c oob.h parser.c parser.h \
-	pep.c pep.h ping.c ping.h presence.c presence.h roster.c \
-	roster.h si.c si.h useravatar.c useravatar.h usermood.c \
-	usermood.h usernick.c usernick.h usertune.c usertune.h xdata.c \
-	xdata.h $(am__append_1)
+	iq.c iq.h jabber.c jabber.h jabber_wb.c jabber_wb.h \
+	jingle/jingle.c jingle/jingle.h jingle/content.c \
+	jingle/content.h jingle/iceudp.c jingle/iceudp.h \
+	jingle/rawudp.c jingle/rawudp.h jingle/rtp.c jingle/rtp.h \
+	jingle/session.c jingle/session.h jingle/transport.c \
+	jingle/transport.h jutil.c jutil.h message.c message.h \
+	namespaces.h oob.c oob.h parser.c parser.h pep.c pep.h ping.c \
+	ping.h presence.c presence.h roster.c roster.h si.c si.h \
+	useravatar.c useravatar.h usermood.c usermood.h usernick.c \
+	usernick.h usertune.c usertune.h xdata.c xdata.h \
+	$(am__append_1)
 AM_CFLAGS = $(st)
 libxmpp_la_LDFLAGS = -module -avoid-version
 @STATIC_JABBER_FALSE@st = 
@@ -560,7 +560,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libjabber_la-auth_scram.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libjabber_la-bosh.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libjabber_la-buddy.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libjabber_la-jabber_wb.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libjabber_la-caps.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libjabber_la-chat.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libjabber_la-content.Plo@am__quote@
@@ -575,6 +574,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libjabber_la-iceudp.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libjabber_la-iq.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libjabber_la-jabber.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libjabber_la-jabber_wb.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libjabber_la-jingle.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libjabber_la-jingleinfo.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libjabber_la-jutil.Plo@am__quote@
@@ -670,15 +670,6 @@ libjabber_la-buddy.lo: buddy.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='buddy.c' object='libjabber_la-buddy.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libjabber_la_CFLAGS) $(CFLAGS) -c -o libjabber_la-buddy.lo `test -f 'buddy.c' || echo '$(srcdir)/'`buddy.c
-
-libjabber_la-jabber_wb.lo: jabber_wb.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libjabber_la_CFLAGS) $(CFLAGS) -MT libjabber_la-jabber_wb.lo -MD -MP -MF $(DEPDIR)/libjabber_la-jabber_wb.Tpo -c -o libjabber_la-jabber_wb.lo `test -f 'jabber_wb.c' || echo '$(srcdir)/'`jabber_wb.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libjabber_la-jabber_wb.Tpo $(DEPDIR)/libjabber_la-jabber_wb.Plo
-@am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='jabber_wb.c' object='libjabber_la-jabber_wb.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libjabber_la_CFLAGS) $(CFLAGS) -c -o libjabber_la-jabber_wb.lo `test -f 'jabber_wb.c' || echo '$(srcdir)/'`jabber_wb.c
-
 
 libjabber_la-bosh.lo: bosh.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libjabber_la_CFLAGS) $(CFLAGS) -MT libjabber_la-bosh.lo -MD -MP -MF $(DEPDIR)/libjabber_la-bosh.Tpo -c -o libjabber_la-bosh.lo `test -f 'bosh.c' || echo '$(srcdir)/'`bosh.c
@@ -799,6 +790,14 @@ libjabber_la-jabber.lo: jabber.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='jabber.c' object='libjabber_la-jabber.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libjabber_la_CFLAGS) $(CFLAGS) -c -o libjabber_la-jabber.lo `test -f 'jabber.c' || echo '$(srcdir)/'`jabber.c
+
+libjabber_la-jabber_wb.lo: jabber_wb.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libjabber_la_CFLAGS) $(CFLAGS) -MT libjabber_la-jabber_wb.lo -MD -MP -MF $(DEPDIR)/libjabber_la-jabber_wb.Tpo -c -o libjabber_la-jabber_wb.lo `test -f 'jabber_wb.c' || echo '$(srcdir)/'`jabber_wb.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libjabber_la-jabber_wb.Tpo $(DEPDIR)/libjabber_la-jabber_wb.Plo
+@am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='jabber_wb.c' object='libjabber_la-jabber_wb.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libjabber_la_CFLAGS) $(CFLAGS) -c -o libjabber_la-jabber_wb.lo `test -f 'jabber_wb.c' || echo '$(srcdir)/'`jabber_wb.c
 
 libjabber_la-jingle.lo: jingle/jingle.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libjabber_la_CFLAGS) $(CFLAGS) -MT libjabber_la-jingle.lo -MD -MP -MF $(DEPDIR)/libjabber_la-jingle.Tpo -c -o libjabber_la-jingle.lo `test -f 'jingle/jingle.c' || echo '$(srcdir)/'`jingle/jingle.c
