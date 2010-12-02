@@ -18,6 +18,14 @@ People
 
 We are a group of three students from Indian Institute of Technology, Kharagpur[ India ].It was my idea to implement the whiteboard, I strongly feel that Open Source can be great when you are clear with the idea[ in short don't need a software consultant telling you what you tell him ;) ].
 
+Installing
+
+Remove with configuration files (purge), all old pidgin installations.
+In pidgin-2.7.4 directory run:
+./configure
+make
+sudo make install
+
 Contacts
 
 Sanket( author ): sanket@sanketagarwal.com
