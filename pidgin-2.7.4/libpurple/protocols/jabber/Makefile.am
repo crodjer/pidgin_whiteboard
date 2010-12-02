@@ -81,6 +81,8 @@ JABBERSOURCES = \
 			  roster.h \
 			  si.c \
 			  si.h \
+			  sxe.c \
+			  sxe.h \
 			  useravatar.c \
 			  useravatar.h \
 			  usermood.c \

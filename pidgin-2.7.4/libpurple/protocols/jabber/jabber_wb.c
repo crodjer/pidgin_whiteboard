@@ -44,6 +44,7 @@
 #include "proxy.h"
 #include "request.h"
 #include "server.h"
+#include "sxe.h"
 #include "util.h"
 #include "version.h"
 #include "string.h"
@@ -58,6 +59,7 @@ void handle_wb_accept(JabberWbMessage *jwm)
 	purple_debug_info("jabber-wb", "Handling Wb Accept request\n");
 	account = purple_connection_get_account(gc);
 	wb = purple_whiteboard_get_session(account, to);
+	test_sxe();
 	if (wb == NULL) {
 		wb = jabber_wb_create(account, to);
 	}

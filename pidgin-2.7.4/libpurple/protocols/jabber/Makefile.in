@@ -95,9 +95,9 @@ am__libjabber_la_SOURCES_DIST = adhoccommands.c adhoccommands.h auth.c \
 	jingle/transport.c jingle/transport.h jutil.c jutil.h \
 	message.c message.h namespaces.h oob.c oob.h parser.c parser.h \
 	pep.c pep.h ping.c ping.h presence.c presence.h roster.c \
-	roster.h si.c si.h useravatar.c useravatar.h usermood.c \
-	usermood.h usernick.c usernick.h usertune.c usertune.h xdata.c \
-	xdata.h auth_cyrus.c libxmpp.c
+	roster.h si.c si.h sxe.c sxe.h useravatar.c useravatar.h \
+	usermood.c usermood.h usernick.c usernick.h usertune.c \
+	usertune.h xdata.c xdata.h auth_cyrus.c libxmpp.c
 @USE_CYRUS_SASL_TRUE@am__objects_1 = libjabber_la-auth_cyrus.lo
 am__objects_2 = libjabber_la-adhoccommands.lo libjabber_la-auth.lo \
 	libjabber_la-auth_digest_md5.lo libjabber_la-auth_plain.lo \
@@ -116,7 +116,7 @@ am__objects_2 = libjabber_la-adhoccommands.lo libjabber_la-auth.lo \
 	libjabber_la-message.lo libjabber_la-oob.lo \
 	libjabber_la-parser.lo libjabber_la-pep.lo \
 	libjabber_la-ping.lo libjabber_la-presence.lo \
-	libjabber_la-roster.lo libjabber_la-si.lo \
+	libjabber_la-roster.lo libjabber_la-si.lo libjabber_la-sxe.lo \
 	libjabber_la-useravatar.lo libjabber_la-usermood.lo \
 	libjabber_la-usernick.lo libjabber_la-usertune.lo \
 	libjabber_la-xdata.lo $(am__objects_1)
@@ -436,9 +436,9 @@ JABBERSOURCES = adhoccommands.c adhoccommands.h auth.c auth.h \
 	jingle/session.c jingle/session.h jingle/transport.c \
 	jingle/transport.h jutil.c jutil.h message.c message.h \
 	namespaces.h oob.c oob.h parser.c parser.h pep.c pep.h ping.c \
-	ping.h presence.c presence.h roster.c roster.h si.c si.h \
-	useravatar.c useravatar.h usermood.c usermood.h usernick.c \
-	usernick.h usertune.c usertune.h xdata.c xdata.h \
+	ping.h presence.c presence.h roster.c roster.h si.c si.h sxe.c \
+	sxe.h useravatar.c useravatar.h usermood.c usermood.h \
+	usernick.c usernick.h usertune.c usertune.h xdata.c xdata.h \
 	$(am__append_1)
 AM_CFLAGS = $(st)
 libxmpp_la_LDFLAGS = -module -avoid-version
@@ -591,6 +591,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libjabber_la-rtp.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libjabber_la-session.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libjabber_la-si.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libjabber_la-sxe.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libjabber_la-transport.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libjabber_la-useravatar.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libjabber_la-usermood.Plo@am__quote@
@@ -926,6 +927,14 @@ libjabber_la-si.lo: si.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='si.c' object='libjabber_la-si.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libjabber_la_CFLAGS) $(CFLAGS) -c -o libjabber_la-si.lo `test -f 'si.c' || echo '$(srcdir)/'`si.c
+
+libjabber_la-sxe.lo: sxe.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libjabber_la_CFLAGS) $(CFLAGS) -MT libjabber_la-sxe.lo -MD -MP -MF $(DEPDIR)/libjabber_la-sxe.Tpo -c -o libjabber_la-sxe.lo `test -f 'sxe.c' || echo '$(srcdir)/'`sxe.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libjabber_la-sxe.Tpo $(DEPDIR)/libjabber_la-sxe.Plo
+@am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sxe.c' object='libjabber_la-sxe.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libjabber_la_CFLAGS) $(CFLAGS) -c -o libjabber_la-sxe.lo `test -f 'sxe.c' || echo '$(srcdir)/'`sxe.c
 
 libjabber_la-useravatar.lo: useravatar.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libjabber_la_CFLAGS) $(CFLAGS) -MT libjabber_la-useravatar.lo -MD -MP -MF $(DEPDIR)/libjabber_la-useravatar.Tpo -c -o libjabber_la-useravatar.lo `test -f 'useravatar.c' || echo '$(srcdir)/'`useravatar.c
