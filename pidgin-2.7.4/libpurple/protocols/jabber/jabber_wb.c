@@ -58,8 +58,8 @@ void handle_wb_accept(JabberWbMessage *jwm)
 	char *to = jwm->jm->from;
 	purple_debug_info("jabber-wb", "Handling Wb Accept request\n");
 	account = purple_connection_get_account(gc);
+	sxe_send_generic(gc, to, "test", SXE_CONNECT);
 	wb = purple_whiteboard_get_session(account, to);
-	test_sxe();
 	if (wb == NULL) {
 		wb = jabber_wb_create(account, to);
 	}

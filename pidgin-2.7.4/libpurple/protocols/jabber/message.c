@@ -35,6 +35,7 @@
 #include "xmlnode.h"
 #include "pep.h"
 #include "smiley.h"
+#include "sxe.h"
 #include "iq.h"
 #include "jabber_wb.h"
 
@@ -773,6 +774,11 @@ void jabber_message_parse(JabberStream *js, xmlnode *packet)
 			}
 		} else if(!strcmp(child->name, "whiteboard")) {
 			jabber_wb_message_parse(jm, packet);
+			jabber_message_free(jm);
+			return;
+		}
+		else if(!strcmp(child->name, "sxe")) {
+			sxe_message_parse(jm, packet);
 			jabber_message_free(jm);
 			return;
 		}

@@ -28,4 +28,30 @@
 #include "cmds.h"
 #include "message.h"
 
-void test_sxe(void);
+typedef enum _SXEMessageType {
+	SXE_CONNECT,
+	SXE_OFFER_STATE,
+	SXE_ACCEPT_STATE,
+	SXE_REFUSE_STATE,
+	SXE_SEND_STATE,
+} SXEMessageType;
+
+typedef struct _JabberSXEMessage {
+	JabberMessage *jm;
+	SXEMessageType type;
+	char *data;
+	char *state;
+}JabberSXEMessage;
+
+typedef struct _SXESession{
+	char *state;
+	char *id;
+}SXESession;
+
+void handle_sxe_accept_state(JabberSXEMessage *jsm);
+void handle_sxe_connect(JabberSXEMessage *jsm);
+void handle_sxe_offer_state(JabberSXEMessage *jsm);
+void handle_sxe_refuse_state(JabberSXEMessage *jsm);
+void handle_sxe_send_state(JabberSXEMessage *jsm);
+void sxe_message_parse(JabberMessage *jm, xmlnode *packet);
+void sxe_send_generic(PurpleConnection *gc, const char *to, const char *session, SXEMessageType type);
