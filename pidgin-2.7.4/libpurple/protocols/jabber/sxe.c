@@ -49,30 +49,31 @@
 #include "string.h"
 #include "sxe.h"
 
+static GList *sxeList = NULL;
 
 void handle_sxe_accept_state(JabberSXEMessage *jsm)
 {
-	purple_debug_info("sxe", "Handeling SXE State Accept\n");
+	purple_debug_info("sxe", "Handling SXE State Accept\n");
 }
 
 void handle_sxe_connect(JabberSXEMessage *jsm)
 {
-	purple_debug_info("sxe", "Handeling SXE Connect\n");
+	purple_debug_info("sxe", "Handling SXE Connect\n");
 }
 
 void handle_sxe_offer_state(JabberSXEMessage *jsm)
 {
-	purple_debug_info("sxe", "Handeling SXE State Offer\n");
+	purple_debug_info("sxe", "Handling SXE State Offer\n");
 }
 
 void handle_sxe_refuse_state(JabberSXEMessage *jsm)
 {
-	purple_debug_info("sxe", "Handeling SXE State Refuse\n");
+	purple_debug_info("sxe", "Handling SXE State Refuse\n");
 }
 
 void handle_sxe_send_state(JabberSXEMessage *jsm)
 {
-	purple_debug_info("sxe", "Handeling SXE State Send\n");
+	purple_debug_info("sxe", "Handling SXE State Send\n");
 }
 
 void sxe_message_parse(JabberMessage *jm, xmlnode *packet)
@@ -119,13 +120,25 @@ void sxe_message_parse(JabberMessage *jm, xmlnode *packet)
 	}
 }
 
-void sxe_send_generic(PurpleConnection *gc, const char *to, const char *session, SXEMessageType type)
+void sxe_send_generic(PurpleConnection *gc, const char *to, SXEMessageType type)
 {
 	JabberStream *js = purple_connection_get_protocol_data(gc);
 	JabberBuddy *jb;
 	JabberBuddyResource *jbr;
 	xmlnode *message, *child;
-	gchar *resource = NULL, *me = NULL, *who = NULL;
+	PurpleAccount *account = purple_connection_get_account(gc);
+	gchar *resource = NULL, *me = NULL, *who = NULL, *new_state;
+	SXESession *sxes = sxe_get_session(account, who);
+	if (!sxes)
+		purple_debug_info("sxe", "Session does not exists, Initiating a new session.\n");
+		new_state = "\
+				<documen-begin  prolog='data:text/xml,%3C%3Fxml%20version%3D%271.\
+				0%27%20standalone%3D%27no%27%3F%3E%0A%3C%21DOCTYPE%20svg%\
+				20PUBLIC%20%27-%2F%2FW3C%2F%2FDTD%20SVG%201.1%2F%2FEN%27%\
+				20%27http%3A%2F%2Fwww.w3.org%2FGraphics%2FSVG%2F1.1%2FDTD\
+				%2Fsvg11.dtd%27%3E%0A'/><document-end last-sender='' last-id=''>\
+		";
+		sxes = sxe_session_create(account, who, new_state, js);
 	jb = jabber_buddy_find(js, to, FALSE);
 	if (!jb) {
 		purple_debug_error("sxe", "Could not find Jabber buddy\n");
@@ -145,7 +158,7 @@ void sxe_send_generic(PurpleConnection *gc, const char *to, const char *session,
 	xmlnode_set_attrib(message, "from", me);
 	child = xmlnode_new_child(message, "sxe");
 	xmlnode_set_attrib(child, "xmlns", "urn:xmpp:sxe:0");
-	xmlnode_set_attrib(child, "session", session);
+	xmlnode_set_attrib(child, "session", sxes->id);
 	xmlnode_set_attrib(child, "id", jabber_get_next_id(js));
 	if (type==SXE_CONNECT){
 		child = xmlnode_new_child(child, "connect");
@@ -162,8 +175,37 @@ void sxe_send_generic(PurpleConnection *gc, const char *to, const char *session,
 		child = xmlnode_new_child(child, "refuse-state");
 	}
 	else if (type==SXE_SEND_STATE){
+		child = xmlnode_new_child(child, "state");
+		xmlnode_insert_data(child,sxes->state,strlen(sxes->state));
+		purple_debug_info("sxe", "Sent the document state\n");
 	}
 	jabber_send(purple_connection_get_protocol_data(gc), message);
-	purple_debug_info("sxe", "Sent an sxe message!\n");
+}
 
+SXESession *sxe_session_create(PurpleAccount *account, const char *who, char *state, JabberStream *js)
+{
+	SXESession *sxes = g_new0(SXESession , 1);
+	sxes->account = account;
+	sxes->state = state;
+	sxes->who = g_strdup(who);
+	sxes->id = jabber_get_next_id(js);
+	sxeList = g_list_append(sxeList, sxes);
+
+	return sxes;
+}
+
+SXESession *sxe_get_session(const PurpleAccount *account, const char *who)
+{
+	SXESession *sxes;
+	GList *l = sxeList;
+
+	while(l != NULL)
+	{
+		sxes = l->data;
+		if(sxes->account == account && purple_strequal(sxes->who, who))
+			return sxes;
+		l = l->next;
+	}
+
+	return NULL;
 }

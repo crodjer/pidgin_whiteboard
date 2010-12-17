@@ -44,6 +44,8 @@ typedef struct _JabberSXEMessage {
 }JabberSXEMessage;
 
 typedef struct _SXESession{
+	PurpleAccount *account;
+	char *who;
 	char *state;
 	char *id;
 }SXESession;
@@ -54,4 +56,6 @@ void handle_sxe_offer_state(JabberSXEMessage *jsm);
 void handle_sxe_refuse_state(JabberSXEMessage *jsm);
 void handle_sxe_send_state(JabberSXEMessage *jsm);
 void sxe_message_parse(JabberMessage *jm, xmlnode *packet);
-void sxe_send_generic(PurpleConnection *gc, const char *to, const char *session, SXEMessageType type);
+void sxe_send_generic(PurpleConnection *gc, const char *to, SXEMessageType type);
+SXESession *sxe_get_session(const PurpleAccount *account, const char *who);
+SXESession *sxe_session_create(PurpleAccount *account, const char *who, char *state, JabberStream *js);

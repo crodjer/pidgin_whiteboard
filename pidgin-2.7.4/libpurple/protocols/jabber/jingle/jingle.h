@@ -48,6 +48,7 @@ extern "C" {
 #define JINGLE_TRANSPORT_IBB "urn:xmpp:jingle:transports:ibb:0"
 #define JINGLE_TRANSPORT_ICEUDP "urn:xmpp:jingle:transports:ice-udp:1"
 #define JINGLE_TRANSPORT_RAWUDP "urn:xmpp:jingle:transports:raw-udp:1"
+#define JINGLE_TRANSPORT_SXE "urn:xmpp:jingle:transports:sxe"
 
 typedef enum {
 	JINGLE_UNKNOWN_TYPE,
