@@ -29,6 +29,9 @@
 #include "message.h"
 
 typedef enum _SXEMessageType {
+	SXE_SESSION_INIT,
+	SXE_SESSION_ACCEPT,
+	SXE_SESSION_END,
 	SXE_CONNECT,
 	SXE_OFFER_STATE,
 	SXE_ACCEPT_STATE,
@@ -39,15 +42,15 @@ typedef enum _SXEMessageType {
 typedef struct _JabberSXEMessage {
 	JabberMessage *jm;
 	SXEMessageType type;
-	char *data;
+	const char *session;
 	char *state;
 }JabberSXEMessage;
 
 typedef struct _SXESession{
 	PurpleAccount *account;
-	char *who;
+	const char *who;
 	char *state;
-	char *id;
+	const char *id;
 }SXESession;
 
 void handle_sxe_accept_state(JabberSXEMessage *jsm);
@@ -55,7 +58,17 @@ void handle_sxe_connect(JabberSXEMessage *jsm);
 void handle_sxe_offer_state(JabberSXEMessage *jsm);
 void handle_sxe_refuse_state(JabberSXEMessage *jsm);
 void handle_sxe_send_state(JabberSXEMessage *jsm);
+void handle_sxe_session_init(JabberSXEMessage *jsm);
+void handle_sxe_session_accept(JabberSXEMessage *jsm);
+void handle_sxe_session_end(JabberSXEMessage *jsm);
+PurpleAccount *sxe_message_get_account(JabberSXEMessage *jsm);
+const char*sxe_message_get_buddy(JabberSXEMessage *jsm);
+PurpleConnection *sxe_message_get_connection(JabberSXEMessage *jsm);
+SXESession *sxe_message_create_session(JabberSXEMessage *jsm);
+SXESession *sxe_message_get_session(JabberSXEMessage *jsm);
+void sxe_initiate(PurpleConnection *gc, const char *name);
 void sxe_message_parse(JabberMessage *jm, xmlnode *packet);
-void sxe_send_generic(PurpleConnection *gc, const char *to, SXEMessageType type);
-SXESession *sxe_get_session(const PurpleAccount *account, const char *who);
-SXESession *sxe_session_create(PurpleAccount *account, const char *who, char *state, JabberStream *js);
+void sxe_send_generic(PurpleConnection *gc, const char *to, SXEMessageType type, const char *session);
+SXESession *sxe_session_get(PurpleConnection *gc, const char *who);
+SXESession *sxe_session_create(PurpleConnection *gc, const char *who, const char *session);
+void sxe_session_end(SXESession *sxes );

@@ -58,7 +58,6 @@ void handle_wb_accept(JabberWbMessage *jwm)
 	char *to = jwm->jm->from;
 	purple_debug_info("jabber-wb", "Handling Wb Accept request\n");
 	account = purple_connection_get_account(gc);
-	sxe_send_generic(gc, to, SXE_SEND_STATE);
 	wb = purple_whiteboard_get_session(account, to);
 	if (wb == NULL) {
 		wb = jabber_wb_create(account, to);
@@ -107,7 +106,6 @@ void handle_wb_end(JabberWbMessage *jwm)
 void handle_wb_initiate(JabberWbMessage *jwm)
 {
 	purple_debug_info("jabber-wb", "Handling Wb Initiate request\n");
-
 	jabber_wb_accept(jwm, jwm->jm->from);
 }
 
@@ -284,6 +282,7 @@ void jabber_wb_initiate(PurpleConnection *gc, const char *name)
 	g_return_if_fail(gc);
 	g_return_if_fail(name);
 	account = purple_connection_get_account(gc);
+	sxe_initiate(gc, to);
 	wb = purple_whiteboard_get_session(account, to);
 	if (wb == NULL) {
 		purple_debug_info("jabber-wb", "Initiating a new whiteboard session.\n");
