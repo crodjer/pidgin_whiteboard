@@ -51,36 +51,35 @@
 #include "sxe.h"
 
 static GList *sxeList = NULL;
-/*
- * A counter for grouping of debug messages, just put
- * purple_debug_info("sxe", "%d. ", counter);
- * befor debug message to print current message group in debug window.
- */
-static int counter=0;
 
-void handle_sxe_accept_state(JabberSXEMessage *jsm)
+static void handle_sxe_accept_state(JabberSXEMessage *jsm)
 {
 	purple_debug_info("sxe", "Handling SXE State Accept from %s\n", sxe_message_get_buddy(jsm));
+	sxe_message_free(jsm);
 }
 
-void handle_sxe_connect(JabberSXEMessage *jsm)
+static void handle_sxe_connect(JabberSXEMessage *jsm)
 {
 	purple_debug_info("sxe", "Handling SXE Connect from %s\n", sxe_message_get_buddy(jsm));
+	sxe_message_free(jsm);
 }
 
-void handle_sxe_offer_state(JabberSXEMessage *jsm)
+static void handle_sxe_offer_state(JabberSXEMessage *jsm)
 {
 	purple_debug_info("sxe", "Handling SXE State Offer from %s\n", sxe_message_get_buddy(jsm));
+	sxe_message_free(jsm);
 }
 
-void handle_sxe_refuse_state(JabberSXEMessage *jsm)
+static void handle_sxe_refuse_state(JabberSXEMessage *jsm)
 {
 	purple_debug_info("sxe", "Handling SXE State Refuse from %s\n", sxe_message_get_buddy(jsm));
+	sxe_message_free(jsm);
 }
 
-void handle_sxe_send_state(JabberSXEMessage *jsm)
+static void handle_sxe_send_state(JabberSXEMessage *jsm)
 {
 	purple_debug_info("sxe", "Handling SXE State Send from %s\n", sxe_message_get_buddy(jsm));
+	sxe_message_free(jsm);
 }
 
 /*
@@ -90,7 +89,7 @@ void sxe_initiate(PurpleConnection *gc, const char *name)
 {
 	JabberBuddyResource *jbr;
 	JabberBuddy *jb = jabber_buddy_find(purple_connection_get_protocol_data(gc), name, FALSE);
-	SXESession *sxes = sxe_session_get(gc, "Test");
+	SXESession *sxes;
 	gchar *resource = NULL, *to = NULL;
 	if (!jb) {
 		purple_debug_error("sxe", "Could not find Jabber buddy\n");
@@ -104,54 +103,64 @@ void sxe_initiate(PurpleConnection *gc, const char *name)
 		return;
 	}
 	to = g_strdup_printf("%s/%s", name, jbr->name);
-	purple_debug_info("sxe", "%d. ", ++counter);
+	purple_debug_info("sxe", "\n");
 	purple_debug_info("sxe", "Initiating thread...\n");
-	if (sxes){
-		purple_debug_info("sxe", "%d. ", counter);
-		purple_debug_error("sxe", "SXE session with ID:%s, already exists!!\n", sxes->id);
-	}
-	else{
-		sxes = sxe_session_create(gc, "Test");
-	}
-	sxe_send_generic(gc, to, SXE_SESSION_INIT, "Test");
+	sxes = sxe_session_create(gc, "test-session");
+	sxe_session_add_user(sxes,  to);
+	sxe_send_generic(gc, to, SXE_SESSION_INIT, "test-session");
 }
 
-void handle_sxe_session_init(JabberSXEMessage *jsm)
+static void handle_sxe_session_init(JabberSXEMessage *jsm)
 {
-	SXESession *sxes = sxe_message_get_session(jsm);
-	purple_debug_info("sxe", "%d. ", counter);
+	SXESession *sxes ;
 	purple_debug_info("sxe", "Handling SXE Session Init from %s\n",sxe_message_get_buddy(jsm));
-	if (sxes){
-		purple_debug_info("sxe", "%d. ", counter);
-		purple_debug_error("sxe", "SXE session with ID:%s, already exists!!\n", sxes->id);
-	}
-	else{
-		sxes = sxe_message_create_session(jsm);
-	}
-	sxes = sxe_session_add_user(sxes,  sxe_message_get_buddy(jsm));
+	sxes = sxe_message_create_session(jsm);
+	sxe_session_add_user(sxes,  sxe_message_get_buddy(jsm));
 	sxe_send_generic(sxe_message_get_connection(jsm), sxe_message_get_buddy(jsm), SXE_SESSION_ACCEPT, jsm->session);
+	sxe_message_free(jsm);
 }
 
-void handle_sxe_session_accept(JabberSXEMessage *jsm)
+static void handle_sxe_session_accept(JabberSXEMessage *jsm)
 {
-	SXESession *sxes = sxe_message_get_session(jsm);
-	purple_debug_info("sxe", "%d. ", counter);
+	SXESession *sxes;
+
 	purple_debug_info("sxe", "Handling SXE Session Accept from %s\n",sxe_message_get_buddy(jsm));
+	sxes = sxe_message_get_session(jsm);
 	if (sxes){
-		sxes = sxe_session_add_user(sxes,  sxe_message_get_buddy(jsm));
-		sxe_send_generic(sxe_message_get_connection(jsm), sxe_message_get_buddy(jsm), SXE_SESSION_END, sxes->id);
+		sxe_session_get_users(sxes);
+		sxe_session_end(sxes);
+		/*
+		 * End sxe session and send end message.
+		 */
+		sxe_send_generic(sxe_message_get_connection(jsm), sxe_message_get_buddy(jsm), SXE_SESSION_END, jsm->session);
 	}
 	else{
-		purple_debug_info("sxe", "%d. ", counter);
 		purple_debug_error("sxe", "SXE session with ID:%s does not exists!!\n", jsm->session);
 	}
-
+	sxe_message_free(jsm);
 }
 
-void handle_sxe_session_end(JabberSXEMessage *jsm)
+static void handle_sxe_session_end(JabberSXEMessage *jsm)
 {
-	purple_debug_info("sxe", "%d. ", counter);
+	SXESession *sxes;
 	purple_debug_info("sxe", "Handling SXE Session End from %s\n", sxe_message_get_buddy(jsm));
+	sxes = sxe_message_get_session(jsm);
+	if (sxes){
+		sxe_session_get_users(sxes);
+		/*
+		* End sxe session.
+		*/
+		sxe_session_end(sxes);
+	}
+	else{
+		purple_debug_error("sxe", "SXE session Account:%s ID:%s does not exists!!\n", sxe_message_get_account(jsm)->username, jsm->session);
+	}
+	sxe_message_free(jsm);
+}
+
+SXESession *sxe_message_create_session(JabberSXEMessage *jsm)
+{
+	return sxe_session_create(sxe_message_get_connection(jsm), jsm->session);
 }
 
 PurpleAccount *sxe_message_get_account(JabberSXEMessage *jsm)
@@ -170,14 +179,17 @@ PurpleConnection *sxe_message_get_connection(JabberSXEMessage *jsm)
 	return jsm->jm->js->gc;
 }
 
-SXESession *sxe_message_create_session(JabberSXEMessage *jsm)
-{
-	return sxe_session_create(sxe_message_get_connection(jsm), jsm->session);
-}
-
 SXESession *sxe_message_get_session(JabberSXEMessage *jsm)
 {
 	return sxe_session_get(sxe_message_get_connection(jsm), jsm->session);
+}
+
+void sxe_message_free(JabberSXEMessage *jsm)
+{
+	//jabber_message_free(jsm->jm); 	Program received signal SIGSEGV, Segmentation fault.	0x00ea08bb in ?? ()
+	//g_free((char *)jsm->session);  	*** glibc detected *** /usr/local/bin/pidgin: double free or corruption (fasttop)
+	g_free(jsm->state);
+	g_free(jsm);
 }
 
 void sxe_message_parse(JabberMessage *jm, xmlnode *packet)
@@ -266,8 +278,8 @@ void sxe_send_generic(PurpleConnection *gc, const char *to, SXEMessageType type,
 		purple_debug_info("sxe", "Sent the document state\n");
 	}
 	jabber_send(purple_connection_get_protocol_data(gc), message);
-	purple_debug_info("sxe", "%d. ", counter++);
-	purple_debug_info("sxe", "Sent SXE message, Buddy: %s, Session: %s, Action: %d\n", to, session, type);
+	purple_debug_info("sxe", "Sent SXE message, Buddy: %s, Session: %s, Action: %d\n\n", to, session, type);
+	g_free(message);
 }
 
 SXESession *sxe_session_create(PurpleConnection *gc, const char *session)
@@ -280,25 +292,30 @@ SXESession *sxe_session_create(PurpleConnection *gc, const char *session)
 			%2Fsvg11.dtd%27%3E%0A'/><document-end last-sender='' last-id=''>\
 	";
 	PurpleAccount *account = purple_connection_get_account(gc);
-	SXESession *sxes = g_new0(SXESession , 1);
-	sxes->account = account;
-	sxes->state = new_state;
-	sxes->users = NULL;
-	sxes->id = session;
-	sxeList = g_list_append(sxeList, sxes);
-	purple_debug_info("sxe", "%d. ", counter);
-	purple_debug_info("sxe", "Created SXE Session, ID: %s\n", sxes->id);
+	SXESession *sxes = sxe_session_get(gc, session);
+	if (sxes){
+
+		purple_debug_error("sxe", "SXE session with ID:%s, already exists!!\n", sxes->id);
+	}
+	else{
+		sxes = g_new0(SXESession , 1);
+		sxes->account = account;
+		sxes->state = new_state;
+		sxes->users = NULL;
+		sxes->id = g_malloc(strlen(session)+1);
+		strcpy((char *)sxes->id, session);
+		sxeList = g_list_append(sxeList, sxes);
+		purple_debug_info("sxe", "Created SXE Session (Account:%s, ID: %s)\n", sxes->account->username, sxes->id);
+	}
 	return sxes;
 }
 
-/*
- * Some GList handling problems
- */
 SXESession *sxe_session_add_user(SXESession *sxes, const char *who)
 {
-	//sxes->users =  g_list_append(sxes->users, who);
-	purple_debug_info("sxe", "%d. ", counter);
-	purple_debug_info("sxe", "Adding Buddy: %s to Session, ID: %s\n", who, sxes->id);
+	char *user = g_malloc(strlen(who)+1);
+	strcpy(user, who);
+	purple_debug_info("sxe", "Adding Buddy: %s to Session (Account:%s, ID: %s, User List: %s)\n", who, sxes->account->username, sxes->id, sxe_session_get_users(sxes));
+	sxes->users =  g_list_append(sxes->users, (gchar *)user);
 	return sxes;
 }
 
@@ -307,14 +324,13 @@ SXESession *sxe_session_get(PurpleConnection *gc, const char *session)
 	PurpleAccount *account = purple_connection_get_account(gc);
 	SXESession *sxes;
 	GList *l = sxeList;
-
+	//purple_debug_info("sxe", "Available Sessions: \n%s", sxe_session_get_list());
 	while(l != NULL)
 	{
 		sxes = l->data;
 		if(sxes->account == account && purple_strequal(sxes->id, session))
 		{
-			purple_debug_info("sxe", "%d. ", counter);
-			purple_debug_info("sxe", "Got SXE Session, ID: %s\n", sxes->id);
+			purple_debug_info("sxe", "Got SXE Session (Account:%s, ID: %s, User List: %s)\n", sxes->account->username, sxes->id, sxe_session_get_users(sxes));
 			return sxes;
 		}
 		l = l->next;
@@ -322,51 +338,53 @@ SXESession *sxe_session_get(PurpleConnection *gc, const char *session)
 	return NULL;
 }
 
-/*
- * Some GList handling problems
- */
-char *sxe_session_get_users(SXESession *sxes)
+char *sxe_session_get_list(void)
 {
-	GList *l = sxes->users;
-	char *user, *user_list = "";
-	while(l!=NULL)
-	{
-		//user = l->data;
-		//user_list += user + ";";
-	}
-	purple_debug_info("sxe", "%d. ", counter);
-	purple_debug_info("sxe", "SXE Session, ID: %s, User List: %s\n", sxes->id, user_list);
-	l=l->next;
-	return user_list;
-}
-/*
- * To be written
- */
-SXESession *sxe_session_get_by_account(PurpleConnection *gc, const char *who)
-{
-	//PurpleAccount *account = purple_connection_get_account(gc);
 	SXESession *sxes;
 	GList *l = sxeList;
-
+	char *session_list="";
 	while(l != NULL)
 	{
-
 		sxes = l->data;
-		/*
-		if(sxes->account == account && purple_strequal(sxes->who, who))
-		{
-			purple_debug_info("sxe", "%d. ", counter);
-			purple_debug_info("sxe", "Got SXE Session, Buddy: %s, ID: %s\n", sxes->who, sxes->id);
-			return sxes;
-		}
-		*/
+		session_list = g_strdup_printf("%sAccount:%s, ID: %s, User List: %s\n",session_list ,sxes->account->username, sxes->id, sxe_session_get_users(sxes));
 		l = l->next;
 	}
-	return NULL;
+	return session_list;
 }
 
+char *sxe_session_get_users(SXESession *sxes)
+{
+	char *user, *user_list = "";
+	GList *l = sxes->users;
+	while(l!=NULL)
+	{
+		user = l->data;
+		user_list = g_strdup_printf("%s%s;",user_list ,user);
+		l=l->next;
+	}
+	return (!strcmp(user_list, ""))?"Empty":user_list;
+}
+
+/*
+ * Gives Error:
+ * *** glibc detected *** /usr/local/bin/pidgin: double free or corruption (fasttop): 0x08761268 ***
+ */
+void sxe_session_users_free(GList *l)
+{
+	while(l != NULL)
+	{
+		g_free(l->data);
+	}
+}
+/*
+ * Free the memory here
+ */
 void sxe_session_end(SXESession *sxes)
 {
-	purple_debug_info("sxe", "%d. ", counter);
-	purple_debug_info("sxe", "Ending SXE Session, ID: %s\n", sxes->id);
+	g_return_if_fail(sxes != NULL);
+	purple_debug_info("sxe", "Ending SXE Session (Account:%s, ID: %s)\n", sxes->account->username, sxes->id);
+	g_free((char *)sxes->id);
+	//sxe_session_users_free(sxes->users);
+	sxeList = g_list_remove(sxeList, sxes);
+	g_free(sxes);
 }
