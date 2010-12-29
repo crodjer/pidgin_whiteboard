@@ -1,0 +1,14 @@
+prefix=/usr/local
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+datarootdir=${prefix}/share
+datadir=${datarootdir}
+sysconfdir=${prefix}/etc
+
+Name: Finch
+Description: Finch is an instant messenger application that uses libpurple for protocol support and ncurses (libgnt) for the UI.
+Version: 2.7.4
+Requires: gnt purple
+Cflags: -I${includedir}/finch
+

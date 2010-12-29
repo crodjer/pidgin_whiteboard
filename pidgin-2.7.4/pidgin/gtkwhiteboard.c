@@ -63,6 +63,8 @@ static void pidgin_whiteboard_rgb24_to_rgb48(int color_rgb, GdkColor *color);
 
 static void color_select_dialog(GtkWidget *widget, PidginWhiteboard *gtkwb);
 
+static void circle_select_dialog(GtkWidget *widget, PidginWhiteboard *gtkwb);
+
 /******************************************************************************
  * Globals
  *****************************************************************************/
@@ -121,6 +123,7 @@ static void pidgin_whiteboard_create(PurpleWhiteboard *wb)
 	GtkWidget *clear_button;
 	GtkWidget *save_button;
 	GtkWidget *color_button;
+	GtkWidget *circle_button;
 
 	PidginWhiteboard *gtkwb = g_new0(PidginWhiteboard, 1);
 
@@ -254,6 +257,13 @@ static void pidgin_whiteboard_create(PurpleWhiteboard *wb)
 	gtk_widget_show(color_button);
 	g_signal_connect(G_OBJECT(color_button), "clicked",
 					 G_CALLBACK(color_select_dialog), gtkwb);
+    /* Add a button to draw circle */
+	circle_button = gtk_button_new_with_label("Circle");
+	gtk_box_pack_start(GTK_BOX(vbox_controls), circle_button, FALSE, FALSE,
+			PIDGIN_HIG_BOX_SPACE);
+	gtk_widget_show(circle_button);
+	g_signal_connect(G_OBJECT(circle_button), "clicked",
+                     G_CALLBACK(circle_select_dialog), gtkwb);
 
 	/* Make all this (window) visible */
 	gtk_widget_show(window);
@@ -889,4 +899,77 @@ static void color_select_dialog(GtkWidget *widget, PidginWhiteboard *gtkwb)
 
 	gtk_widget_show_all(GTK_WIDGET(dialog));
 }
+static void circle_select_dialog(GtkWidget *widget, PidginWhiteboard *gtkwb)
+{
+	GtkWidget *dialog, *table, *x, *y, *radius;
+	GtkWidget *label1, *label2, *label3;
+	int input_x, input_y, input_radius;
+	gint result;
 
+	dialog = gtk_dialog_new_with_buttons("Select Circle", NULL,
+			GTK_DIALOG_MODAL, GTK_STOCK_OK, GTK_RESPONSE_OK, GTK_STOCK_CANCEL,
+			GTK_RESPONSE_CANCEL, NULL);
+	gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
+	/* Create four entries that will tell the user what data to enter. */
+	label1 = gtk_label_new("X:");
+	label2 = gtk_label_new("Y:");
+	label3 = gtk_label_new("Radius:");
+
+	x = gtk_entry_new();
+	y = gtk_entry_new();
+	radius = gtk_entry_new();
+
+	GdkPixmap *pixmap = gtkwb->pixmap;
+	GdkGC *gfx_con = gdk_gc_new(pixmap);
+
+	/*
+	gdk_draw_arc(pixmap, gfx_con, TRUE, 0, 0, 200,	200, 0, FULL_CIRCLE_DEGREES);
+	return;
+	*/
+
+	/* Retrieve the user's information for the default values. */
+	//gtk_entry_set_text(GTK_ENTRY(x), g_get_x_coordinate());
+	//gtk_entry_set_text(GTK_ENTRY(y), g_get_y_coordinate());
+	//gtk_entry_set_text(GTK_ENTRY(radius), g_get_radius());
+
+	gtk_entry_set_text(GTK_ENTRY(x), "10");
+	gtk_entry_set_text(GTK_ENTRY(y), "10");
+	gtk_entry_set_text(GTK_ENTRY(radius), "20");
+
+	table = gtk_table_new(3, 2, FALSE);
+
+	gtk_table_attach_defaults(GTK_TABLE(table), label1, 0, 1, 0, 1);
+	gtk_table_attach_defaults(GTK_TABLE(table), label2, 0, 1, 1, 2);
+	gtk_table_attach_defaults(GTK_TABLE(table), label3, 0, 1, 2, 3);
+
+	gtk_table_attach_defaults(GTK_TABLE(table), x, 1, 2, 0, 1);
+	gtk_table_attach_defaults(GTK_TABLE(table), y, 1, 2, 1, 2);
+	gtk_table_attach_defaults(GTK_TABLE(table), radius, 1, 2, 2, 3);
+
+	gtk_table_set_row_spacings(GTK_TABLE(table), 5);
+	gtk_table_set_col_spacings(GTK_TABLE(table), 5);
+	gtk_container_set_border_width(GTK_CONTAINER(table), 5);
+
+	gtk_box_pack_start_defaults(GTK_BOX(GTK_DIALOG(dialog)->vbox), table);
+	gtk_widget_show_all(GTK_WIDGET(dialog));
+
+	result = gtk_dialog_run(GTK_DIALOG(dialog));
+	switch (result) {
+	case (GTK_RESPONSE_OK):
+		/* ... Handle the response ... */
+		input_x = atoi(gtk_entry_get_text(GTK_ENTRY(x)));
+		input_y = atoi(gtk_entry_get_text(GTK_ENTRY(y)));
+		input_radius = atoi(gtk_entry_get_text(GTK_ENTRY(radius)));
+		purple_debug_info("gtkwhiteboard", "Select Circle top-%d left-%d radius-%d\n",input_x,input_y,input_radius);
+		pidgin_whiteboard_draw_brush_point(gtkwb->wb, input_x, input_y, gtkwb->brush_color, input_radius);
+		//gdk_draw_arc(pixmap, gfx_con, TRUE, input_x, input_y, input_radius,	input_radius, 0, FULL_CIRCLE_DEGREES);
+		//gtk_widget_queue_draw_area(widget, input_x, input_y, input_radius,	input_radius);
+		break;
+	case (GTK_RESPONSE_CANCEL):
+		/* ... Handle the response ... */
+		break;
+	default:
+		break;
+	}
+	gtk_widget_destroy(dialog);
+}
