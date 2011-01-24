@@ -1,1 +1,3 @@
-# dummy
+libzephyr_la-zephyr_err.lo: zephyr_err.c zephyr_err.h
+
+zephyr_err.h:
