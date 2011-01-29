@@ -63,12 +63,7 @@ static void pidgin_whiteboard_rgb24_to_rgb48(int color_rgb, GdkColor *color);
 
 static void color_select_dialog(GtkWidget *widget, PidginWhiteboard *gtkwb);
 
-static void circle_select_dialog(GtkWidget *widget, PidginWhiteboard *gtkwb);
-
-static void empty_circle_button_clicked(GtkWidget *widget, PidginWhiteboard *gtkwb);
-static gboolean button_press_event(GtkWidget *widget, GdkEventButton *event, gpointer data);
-static gboolean button_release_event(GtkWidget *widget, GdkEventButton *event, gpointer data);
-void draw_empty_circle(GtkWidget *widget,int perm, int fill, gdouble x, gdouble y, gdouble r, PidginWhiteboard *gtkwb);
+static void pidgin_whiteboard_draw_empty_eclipse(PurpleWhiteboard *wb, gdouble x, gdouble y, int color, gdouble r);
 
 /******************************************************************************
  * Globals
@@ -92,7 +87,7 @@ static PurpleWhiteboardUiOps ui_ops =
 	pidgin_whiteboard_draw_brush_point,
 	pidgin_whiteboard_draw_brush_line,
 	pidgin_whiteboard_clear,
-	NULL,
+	pidgin_whiteboard_draw_empty_eclipse,
 	NULL,
 	NULL,
 	NULL
@@ -128,7 +123,6 @@ static void pidgin_whiteboard_create(PurpleWhiteboard *wb)
 	GtkWidget *clear_button;
 	GtkWidget *save_button;
 	GtkWidget *color_button;
-	GtkWidget *empty_circle_button;
 
 	PidginWhiteboard *gtkwb = g_new0(PidginWhiteboard, 1);
 
@@ -262,14 +256,7 @@ static void pidgin_whiteboard_create(PurpleWhiteboard *wb)
 	gtk_widget_show(color_button);
 	g_signal_connect(G_OBJECT(color_button), "clicked",
 					 G_CALLBACK(color_select_dialog), gtkwb);
-    /* Add a button to draw empty circle */
-	empty_circle_button = gtk_button_new_with_label("Empty Circle");
-	gtk_box_pack_start(GTK_BOX(vbox_controls), empty_circle_button, FALSE, FALSE,
-			PIDGIN_HIG_BOX_SPACE);
-	gtk_widget_show(empty_circle_button);
-	g_signal_connect(G_OBJECT(empty_circle_button), "clicked",
-                     G_CALLBACK(empty_circle_button_clicked), gtkwb);
-
+					 
 	/* Make all this (window) visible */
 	gtk_widget_show(window);
 
@@ -904,128 +891,30 @@ static void color_select_dialog(GtkWidget *widget, PidginWhiteboard *gtkwb)
 
 	gtk_widget_show_all(GTK_WIDGET(dialog));
 }
-static void circle_select_dialog(GtkWidget *widget, PidginWhiteboard *gtkwb)
+
+static void pidgin_whiteboard_draw_empty_eclipse(PurpleWhiteboard *wb, gdouble x, gdouble y, int color, gdouble r)
 {
-	GtkWidget *dialog, *table, *x, *y, *radius;
-	GtkWidget *label1, *label2, *label3;
-	int input_x, input_y, input_radius;
-	gint result;
-
-	dialog = gtk_dialog_new_with_buttons("Select Circle", NULL,
-			GTK_DIALOG_MODAL, GTK_STOCK_OK, GTK_RESPONSE_OK, GTK_STOCK_CANCEL,
-			GTK_RESPONSE_CANCEL, NULL);
-	gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
-	/* Create four entries that will tell the user what data to enter. */
-	label1 = gtk_label_new("X:");
-	label2 = gtk_label_new("Y:");
-	label3 = gtk_label_new("Radius:");
-
-	x = gtk_entry_new();
-	y = gtk_entry_new();
-	radius = gtk_entry_new();
-
+    PidginWhiteboard *gtkwb = wb->ui_data;
+	GtkWidget *widget = gtkwb->drawing_area;
 	GdkPixmap *pixmap = gtkwb->pixmap;
-	GdkGC *gfx_con = gdk_gc_new(pixmap);
+	
+    GdkGC *gfx_con = gdk_gc_new(pixmap);
+	GdkColor col;
+	/* Interpret and convert color */
+	pidgin_whiteboard_rgb24_to_rgb48(color, &col);
 
-	/*
-	gdk_draw_arc(pixmap, gfx_con, TRUE, 0, 0, 200,	200, 0, FULL_CIRCLE_DEGREES);
-	return;
-	*/
+	gdk_gc_set_rgb_fg_color(gfx_con, &col);
+	/* gdk_gc_set_rgb_bg_color(gfx_con, &col); */
 
-	/* Retrieve the user's information for the default values. */
-	//gtk_entry_set_text(GTK_ENTRY(x), g_get_x_coordinate());
-	//gtk_entry_set_text(GTK_ENTRY(y), g_get_y_coordinate());
-	//gtk_entry_set_text(GTK_ENTRY(radius), g_get_radius());
+    /* Draw a circle */
+	gdk_draw_arc(pixmap,
+	                gfx_con,
+	                TRUE,
+	                x-r, y-r,
+	                2*r, 2*r,
+	                0, FULL_CIRCLE_DEGREES);
 
-	gtk_entry_set_text(GTK_ENTRY(x), "10");
-	gtk_entry_set_text(GTK_ENTRY(y), "10");
-	gtk_entry_set_text(GTK_ENTRY(radius), "20");
+    purple_debug_info("gtkwhiteboard", "empty eclipse was drawn");
 
-	table = gtk_table_new(3, 2, FALSE);
-
-	gtk_table_attach_defaults(GTK_TABLE(table), label1, 0, 1, 0, 1);
-	gtk_table_attach_defaults(GTK_TABLE(table), label2, 0, 1, 1, 2);
-	gtk_table_attach_defaults(GTK_TABLE(table), label3, 0, 1, 2, 3);
-
-	gtk_table_attach_defaults(GTK_TABLE(table), x, 1, 2, 0, 1);
-	gtk_table_attach_defaults(GTK_TABLE(table), y, 1, 2, 1, 2);
-	gtk_table_attach_defaults(GTK_TABLE(table), radius, 1, 2, 2, 3);
-
-	gtk_table_set_row_spacings(GTK_TABLE(table), 5);
-	gtk_table_set_col_spacings(GTK_TABLE(table), 5);
-	gtk_container_set_border_width(GTK_CONTAINER(table), 5);
-
-	gtk_box_pack_start_defaults(GTK_BOX(GTK_DIALOG(dialog)->vbox), table);
-	gtk_widget_show_all(GTK_WIDGET(dialog));
-
-	result = gtk_dialog_run(GTK_DIALOG(dialog));
-	switch (result) {
-	case (GTK_RESPONSE_OK):
-		/* ... Handle the response ... */
-		input_x = atoi(gtk_entry_get_text(GTK_ENTRY(x)));
-		input_y = atoi(gtk_entry_get_text(GTK_ENTRY(y)));
-		input_radius = atoi(gtk_entry_get_text(GTK_ENTRY(radius)));
-		purple_debug_info("gtkwhiteboard", "Select Circle top-%d left-%d radius-%d\n",input_x,input_y,input_radius);
-		pidgin_whiteboard_draw_brush_point(gtkwb->wb, input_x, input_y, gtkwb->brush_color, input_radius);
-		//gdk_draw_arc(pixmap, gfx_con, TRUE, input_x, input_y, input_radius,	input_radius, 0, FULL_CIRCLE_DEGREES);
-		//gtk_widget_queue_draw_area(widget, input_x, input_y, input_radius,	input_radius);
-		break;
-	case (GTK_RESPONSE_CANCEL):
-		/* ... Handle the response ... */
-		break;
-	default:
-		break;
-	}
-	gtk_widget_destroy(dialog);
-}
-
-static void empty_circle_button_clicked(GtkWidget *widget, PidginWhiteboard *gtkwb)
-{
-    g_signal_connect(G_OBJECT(drawing_area), "button_press_event", G_CALLBACK(button_press_event), gtkwb);
-    g_signal_connect(G_OBJECT(drawing_area), "button_release_event", G_CALLBACK(button_release_event), gtkwb);
-
-    int i;
-    for(i=0;i<5;i++)
-    {
-        GdkEvent* ev;
-        GdkEventType type;
-        gtk_events_pending();
-        ev = gtk_get_current_event();
-        if (type == GDK_BUTTON_PRESS){
-            purple_debug_info("gtkwhiteboard", "button event type is button press");
-        }
-    }
-}
-
-static gboolean button_press_event(GtkWidget *widget, GdkEventButton *event, gpointer data)
-{
-    LastX = event->x;
-    LastY = event->y;
-    purple_debug_info("gtkwhiteboard", "button press occured at x= %d and y=%d",LastX, LastY);
-    return TRUE;
-}
-
-static gboolean button_release_event(GtkWidget *widget, GdkEventButton *event, gpointer data)
-{
-	PidginWhiteboard *gtkwb = (PidginWhiteboard*)data;
-    int radius = sqrt(((LastX-event->x)*(LastX-event->x)) + ((LastY-event->y)*(LastY-event->y)));
-    purple_debug_info("gtkwhiteboard", "button press release occured at x= %d and y=%d",event->x, event->x);
-    draw_empty_circle(widget,1,0,LastX,LastY,radius, gtkwb);
-    return TRUE;
-}
-
-void draw_empty_circle(GtkWidget *widget,int perm, int fill, gdouble x, gdouble y, gdouble r, PidginWhiteboard *gtkwb)
-{
-    GdkGC *gc;
-    GdkColor colour;
-	pidgin_whiteboard_rgb24_to_rgb48(gtkwb->brush_color, &colour);
-    gc = gdk_gc_new(widget->window);
-    gdk_gc_set_foreground(gc, &colour);
-
-    gdk_draw_arc(widget->window,gc,fill,x-r,y-r,r*2,r*2,0,360*64);
-    if (perm) gdk_draw_arc(gtkwb->pixmap,gc,fill,x-r,y-r,r*2,r*2,0,360*64);
-
-    purple_debug_info("gtkwhiteboard", "empty circle is drawn");
-
-    gdk_gc_destroy(gc);
+    gdk_gc_destroy(gfx_con);
 }
